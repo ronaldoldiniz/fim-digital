@@ -498,6 +498,23 @@ function avancarStatus(registroId) {
 }
 
 /**
+ * Volta o status da FIM para a etapa anterior
+ */
+function voltarStatus(registroId) {
+    if (!confirm('Deseja retornar para o status anterior?')) {
+        return;
+    }
+
+    salvarAjax('actions/alterar_status.php', { registro_id: registroId, voltar: 1 }, function(data) {
+        if (data.novo_status) {
+            mostrarToast(`Status retornado para: ${formatarStatus(data.novo_status)}`, 'aviso');
+            // Recarregar página após 1.5s para atualizar visual
+            setTimeout(() => location.reload(), 1500);
+        }
+    });
+}
+
+/**
  * Formata o nome do status para exibição
  */
 function formatarStatus(status) {
