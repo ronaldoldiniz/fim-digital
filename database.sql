@@ -2,8 +2,8 @@
 -- Morotó Indústria e Comércio de Aspiradores Industriais LTDA
 -- CNPJ: 24.390.515/0001-03
 
-CREATE DATABASE IF NOT EXISTS fim_digital CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-USE fim_digital;
+-- Nota: O comando CREATE DATABASE foi removido para compatibilidade com hospedagens. 
+-- Importe este arquivo diretamente dentro do banco de dados criado no seu painel.
 
 CREATE TABLE IF NOT EXISTS usuarios (
     id INT AUTO_INCREMENT PRIMARY KEY,
