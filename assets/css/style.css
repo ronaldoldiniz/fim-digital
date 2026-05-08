@@ -365,8 +365,9 @@ body {
 }
 
 .desvio-alerta {
-    color: var(--cor-desvio-perigo);
-    font-weight: 700;
+    color: #fff !important; /* Texto branco obrigatório para contraste no fundo vermelho */
+    font-weight: 800;
+    border: 1px solid rgba(255,255,255,0.5);
     animation: piscar 1s ease-in-out infinite;
 }
 
