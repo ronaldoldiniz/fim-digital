@@ -1,0 +1,33 @@
+name: Deploy via FTP
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    name: Upload Files to InfinityFree
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🚚 Get latest code
+        uses: actions/checkout@v3
+
+      - name: 📂 Sync files
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          # O InfinityFree usa a pasta htdocs como raiz
+          server-dir: htdocs/
+          # Arquivos para ignorar no upload
+          exclude: |
+            **/.git*
+            **/.git*/**
+            **/node_modules/**
+            .gemini/**
+            scratch/**
+            database.sql
+            GUIA_PUBLICACAO.md
+            README.md
