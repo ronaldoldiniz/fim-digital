@@ -485,16 +485,20 @@ function atualizarClassificacaoVibracao(classificacao) {
  * Avança o status da FIM
  */
 window.avancarStatus = function(registroId) {
-    console.log('Executando: avancarStatus() para ID:', registroId);
-    if (!confirm('Deseja avançar para o próximo status? Verifique se todos os campos obrigatórios estão preenchidos.')) {
-        return;
-    }
+    console.log('--- INICIANDO AVANÇAR STATUS ---');
+    console.log('ID do Registro:', registroId);
 
+    // Removendo confirm para evitar bloqueio do navegador
     salvarAjax('actions/alterar_status.php', { registro_id: registroId }, function(data) {
-        if (data.novo_status) {
-            mostrarToast(`Status atualizado para: ${formatarStatus(data.novo_status)}`, 'sucesso');
-            // Recarregar página após 1.5s para atualizar visual
-            setTimeout(() => location.reload(), 1500);
+        console.log('RESPOSTA DO SERVIDOR (Avançar):', data);
+        if (data.sucesso) {
+            mostrarToast('Status atualizado com sucesso!', 'sucesso');
+            setTimeout(() => {
+                window.location.href = 'formulario.php?id=' + registroId;
+            }, 1000);
+        } else {
+            console.error('ERRO NO SERVIDOR:', data.mensagem);
+            alert('Atenção: ' + data.mensagem);
         }
     });
 }
