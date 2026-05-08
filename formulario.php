@@ -74,18 +74,24 @@ headerHTML('FIM: ' . $reg['id_interno'], 'formulario');
         </div>
     </div>
     <div class="col-md-6 text-md-end mt-3 mt-md-0 d-flex justify-content-md-end gap-2">
+        <button type="button" class="btn btn-outline-danger btn-industrial" onclick="limparFormulario()">
+            <i class="bi bi-trash"></i> Limpar Tudo
+        </button>
         <a href="index.php" class="btn btn-outline-secondary btn-industrial">
             <i class="bi bi-arrow-left"></i> Voltar
         </a>
-        <a href="reports/gerar_pdf.php?id=<?= $reg['id'] ?>" target="_blank" class="btn btn-info btn-industrial">
-            <i class="bi bi-file-pdf"></i> Gerar PDF
-        </a>
-        <?php if (!$finalizado): ?>
-            <?php if ($reg['status'] !== 'EM_BANCADA'): ?>
+        <?php if ($finalizado): ?>
+            <a href="reports/visualizar_fim.php?id=<?= $reg['id'] ?>" target="_blank" class="btn btn-info btn-industrial">
+                <i class="bi bi-printer"></i> Imprimir / PDF
+            </a>
+        <?php endif; ?>
+        <?php if ($reg['status'] !== 'EM_BANCADA'): ?>
             <button class="btn btn-warning btn-industrial text-dark" onclick="voltarStatus(<?= $reg['id'] ?>)">
                 <i class="bi bi-arrow-left-circle"></i> Voltar Status
             </button>
-            <?php endif; ?>
+        <?php endif; ?>
+
+        <?php if (!$finalizado): ?>
             <button class="btn btn-success btn-industrial" onclick="avancarStatus(<?= $reg['id'] ?>)">
                 <i class="bi bi-arrow-right-circle"></i> Avançar Status
             </button>
