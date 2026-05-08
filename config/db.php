@@ -1,38 +1,39 @@
 <?php
 /**
- * FIM Digital - Configuração do Banco de Dados
- * Conexão PDO com MySQL
+ * Configuração de Conexão com o Banco de Dados
+ * Identifica automaticamente se o ambiente é local (XAMPP) ou produção (InfinityFree)
  */
 
-// Configurações do banco de dados
-define('DB_HOST', 'localhost');
-define('DB_NAME', 'fim_digital');
-define('DB_USER', 'root');
-define('DB_PASS', '');
-define('DB_CHARSET', 'utf8mb4');
+// Detecta se estamos rodando localmente
+$is_local = in_array($_SERVER['REMOTE_ADDR'], ['127.0.0.1', '::1']) || $_SERVER['SERVER_NAME'] === 'localhost';
 
-/**
- * Retorna a conexão PDO com o banco de dados
- * Singleton: reutiliza a mesma conexão durante a requisição
- */
-function getConnection(): PDO {
-    static $pdo = null;
+if ($is_local) {
+    // CONFIGURAÇÃO LOCAL (XAMPP)
+    $host = 'localhost';
+    $db   = 'fim_digital';
+    $user = 'root';
+    $pass = '';
+} else {
+    // CONFIGURAÇÃO PRODUÇÃO (INFINITYFREE)
+    $host = 'sql104.infinityfree.com';
+    $db   = 'if0_41866708_controledeinspecoes';
+    $user = 'if0_41866708';
+    $pass = 'ZYzM1s88Or3sRu6';
+}
+
+try {
+    $pdo = new PDO("mysql:host=$host;dbname=$db;charset=utf8mb4", $user, $pass);
     
-    if ($pdo === null) {
-        try {
-            $dsn = "mysql:host=" . DB_HOST . ";dbname=" . DB_NAME . ";charset=" . DB_CHARSET;
-            $options = [
-                PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
-                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-                PDO::ATTR_EMULATE_PREPARES   => false,
-                PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES " . DB_CHARSET
-            ];
-            $pdo = new PDO($dsn, DB_USER, DB_PASS, $options);
-        } catch (PDOException $e) {
-            // Em produção, logar o erro e mostrar mensagem genérica
-            die("Erro de conexão com o banco de dados. Contate o administrador.");
-        }
+    // Configurações importantes para o PDO
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+    $pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
+    
+} catch (PDOException $e) {
+    // Em produção, evitamos mostrar detalhes sensíveis do erro
+    if ($is_local) {
+        die("Erro na conexão local: " . $e->getMessage());
+    } else {
+        die("Erro de conexão com o banco de dados. Por favor, tente novamente mais tarde.");
     }
-    
-    return $pdo;
 }
