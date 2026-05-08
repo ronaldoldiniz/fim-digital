@@ -196,18 +196,18 @@ headerHTML('FIM: ' . $reg['id_interno'], 'formulario');
 
     <!-- INSPEÇÃO E MEDIÇÃO -->
     <div class="card card-industrial mb-4">
-        <div class="card-header titulo-bancada" data-bs-toggle="collapse" data-bs-target="#collapseMedicao" style="cursor:pointer">
-            <h5 class="mb-0 d-flex justify-content-between align-items-center">
-                <span>
-                    <i class="bi bi-tools me-2"></i> INSPEÇÃO E MEDIÇÃO: NA GERAÇÃO
-                    <?php if (!$somosLeitura): ?>
-                        <button type="button" class="btn btn-sm btn-outline-light ms-3 px-3 py-0 fs-8" onclick="event.stopPropagation(); limparSecao('collapseMedicao')">
-                            <i class="bi bi-trash"></i> Limpar Seção
-                        </button>
-                    <?php endif; ?>
-                </span>
-                <i class="bi bi-chevron-down"></i>
-            </h5>
+        <div class="card-header titulo-bancada d-flex justify-content-between align-items-center py-2">
+            <div class="flex-grow-1" data-bs-toggle="collapse" data-bs-target="#collapseMedicao" style="cursor:pointer">
+                <h5 class="mb-0"><i class="bi bi-tools me-2"></i> INSPEÇÃO E MEDIÇÃO: NA GERAÇÃO</h5>
+            </div>
+            <div class="d-flex align-items-center gap-3">
+                <?php if (!$somosLeitura): ?>
+                    <button type="button" class="btn btn-sm btn-outline-light px-3 py-0 fs-8" onclick="limparSecao('collapseMedicao')">
+                        <i class="bi bi-trash"></i> Limpar Seção
+                    </button>
+                <?php endif; ?>
+                <i class="bi bi-chevron-down" data-bs-toggle="collapse" data-bs-target="#collapseMedicao" style="cursor:pointer"></i>
+            </div>
         </div>
         <div id="collapseMedicao" class="collapse show">
             <div class="card-body">
@@ -503,19 +503,18 @@ headerHTML('FIM: ' . $reg['id_interno'], 'formulario');
     </div>
 
     <!-- DADOS DO MOTOR -->
-    <div class="card card-industrial mb-4">
-        <div class="card-header titulo-bancada" data-bs-toggle="collapse" data-bs-target="#collapseMotor" style="cursor:pointer">
-            <h5 class="mb-0 d-flex justify-content-between align-items-center">
-                <span>
-                    <i class="bi bi-lightning-charge me-2"></i> DADOS DO MOTOR
-                    <?php if (!$somosLeitura): ?>
-                        <button type="button" class="btn btn-sm btn-outline-light ms-3 px-3 py-0 fs-8" onclick="event.stopPropagation(); limparSecao('collapseMotor')">
-                            <i class="bi bi-trash"></i> Limpar Seção
-                        </button>
-                    <?php endif; ?>
-                </span>
-                <i class="bi bi-chevron-down"></i>
-            </h5>
+        <div class="card-header titulo-bancada d-flex justify-content-between align-items-center py-2">
+            <div class="flex-grow-1" data-bs-toggle="collapse" data-bs-target="#collapseMotor" style="cursor:pointer">
+                <h5 class="mb-0"><i class="bi bi-lightning-charge me-2"></i> DADOS DO MOTOR</h5>
+            </div>
+            <div class="d-flex align-items-center gap-3">
+                <?php if (!$somosLeitura): ?>
+                    <button type="button" class="btn btn-sm btn-outline-light px-3 py-0 fs-8" onclick="limparSecao('collapseMotor')">
+                        <i class="bi bi-trash"></i> Limpar Seção
+                    </button>
+                <?php endif; ?>
+                <i class="bi bi-chevron-down" data-bs-toggle="collapse" data-bs-target="#collapseMotor" style="cursor:pointer"></i>
+            </div>
         </div>
         <div id="collapseMotor" class="collapse show">
             <div class="card-body">
@@ -658,18 +657,18 @@ headerHTML('FIM: ' . $reg['id_interno'], 'formulario');
     </div>
 
     <!-- VIBRAÇÃO ISO 10816-7 -->
-        <div class="card-header titulo-bancada" data-bs-toggle="collapse" data-bs-target="#collapseVibracao" style="cursor:pointer">
-            <h5 class="mb-0 d-flex justify-content-between align-items-center">
-                <span>
-                    <i class="bi bi-activity me-2"></i> VIBRAÇÃO - VELOCIDADE (mm/s) - ISO 10816-7
-                    <?php if (!$somosLeitura): ?>
-                        <button type="button" class="btn btn-sm btn-outline-light ms-3 px-3 py-0 fs-8" onclick="event.stopPropagation(); limparSecao('collapseVibracao')">
-                            <i class="bi bi-trash"></i> Limpar Seção
-                        </button>
-                    <?php endif; ?>
-                </span>
-                <i class="bi bi-chevron-down"></i>
-            </h5>
+        <div class="card-header titulo-bancada d-flex justify-content-between align-items-center py-2">
+            <div class="flex-grow-1" data-bs-toggle="collapse" data-bs-target="#collapseVibracao" style="cursor:pointer">
+                <h5 class="mb-0"><i class="bi bi-activity me-2"></i> VIBRAÇÃO - VELOCIDADE (mm/s) - ISO 10816-7</h5>
+            </div>
+            <div class="d-flex align-items-center gap-3">
+                <?php if (!$somosLeitura): ?>
+                    <button type="button" class="btn btn-sm btn-outline-light px-3 py-0 fs-8" onclick="limparSecao('collapseVibracao')">
+                        <i class="bi bi-trash"></i> Limpar Seção
+                    </button>
+                <?php endif; ?>
+                <i class="bi bi-chevron-down" data-bs-toggle="collapse" data-bs-target="#collapseVibracao" style="cursor:pointer"></i>
+            </div>
         </div>
         <div id="collapseVibracao" class="collapse show">
         <div class="card-body">
@@ -763,18 +762,18 @@ headerHTML('FIM: ' . $reg['id_interno'], 'formulario');
     </div>
 
     <!-- NA UTILIZAÇÃO -->
-        <div class="card-header titulo-bancada" data-bs-toggle="collapse" data-bs-target="#collapseUtilizacao" style="cursor:pointer">
-            <h5 class="mb-0 d-flex justify-content-between align-items-center">
-                <span>
-                    <i class="bi bi-gear me-2"></i> NA UTILIZAÇÃO
-                    <?php if (!$somosLeitura): ?>
-                        <button type="button" class="btn btn-sm btn-outline-light ms-3 px-3 py-0 fs-8" onclick="event.stopPropagation(); limparSecao('collapseUtilizacao')">
-                            <i class="bi bi-trash"></i> Limpar Seção
-                        </button>
-                    <?php endif; ?>
-                </span>
-                <i class="bi bi-chevron-down"></i>
-            </h5>
+        <div class="card-header titulo-bancada d-flex justify-content-between align-items-center py-2">
+            <div class="flex-grow-1" data-bs-toggle="collapse" data-bs-target="#collapseUtilizacao" style="cursor:pointer">
+                <h5 class="mb-0"><i class="bi bi-gear me-2"></i> NA UTILIZAÇÃO</h5>
+            </div>
+            <div class="d-flex align-items-center gap-3">
+                <?php if (!$somosLeitura): ?>
+                    <button type="button" class="btn btn-sm btn-outline-light px-3 py-0 fs-8" onclick="limparSecao('collapseUtilizacao')">
+                        <i class="bi bi-trash"></i> Limpar Seção
+                    </button>
+                <?php endif; ?>
+                <i class="bi bi-chevron-down" data-bs-toggle="collapse" data-bs-target="#collapseUtilizacao" style="cursor:pointer"></i>
+            </div>
         </div>
         <div id="collapseUtilizacao" class="collapse show">
         <div class="card-body">
