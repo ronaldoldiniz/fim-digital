@@ -169,21 +169,19 @@ window.limparFormulario = function() {
  * @param {string} containerId - ID do elemento pai (ex: collapseMedicao)
  */
 window.limparSecao = function(containerId) {
-    console.log('Tentando limpar seção:', containerId);
+    console.log('--- INICIANDO LIMPEZA DE SEÇÃO ---');
+    console.log('Container ID:', containerId);
+    
     const container = document.getElementById(containerId);
     
     if (!container) {
-        console.error('Container não encontrado:', containerId);
+        console.error('ERRO: Container não encontrado:', containerId);
         return;
     }
 
-    if (!confirm('Deseja limpar todos os campos desta seção?')) {
-        return;
-    }
-
-    // Busca todos os elementos de entrada dentro do container
+    // Removendo confirm para evitar bloqueio do navegador
     const campos = container.querySelectorAll('input, select, textarea');
-    console.log('Campos encontrados para limpar:', campos.length);
+    console.log('Campos encontrados para limpeza:', campos.length);
 
     campos.forEach(campo => {
         // Ignorar campos hidden de sistema
