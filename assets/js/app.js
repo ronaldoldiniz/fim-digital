@@ -140,7 +140,8 @@ function salvarCliente() {
 /**
  * Limpa todos os campos editáveis do formulário
  */
-function limparFormulario() {
+window.limparFormulario = function() {
+    console.log('Executando: window.limparFormulario()');
     if (!confirm('Deseja realmente LIMPAR todos os campos desta tela? Esta ação não pode ser desfeita após salvar.')) {
         return;
     }
@@ -156,8 +157,8 @@ function limparFormulario() {
         }
         
         // Disparar evento de mudança para atualizar cálculos (desvios, etc)
-        campo.dispatchEvent(new Event('change'));
-        campo.dispatchEvent(new Event('input'));
+        campo.dispatchEvent(new Event('change', { bubbles: true }));
+        campo.dispatchEvent(new Event('input', { bubbles: true }));
     });
 
     mostrarToast('Formulário limpo com sucesso!', 'aviso');
@@ -167,7 +168,7 @@ function limparFormulario() {
  * Limpa apenas os campos de uma seção específica
  * @param {string} containerId - ID do elemento pai (ex: collapseMedicao)
  */
-function limparSecao(containerId) {
+window.limparSecao = function(containerId) {
     console.log('Tentando limpar seção:', containerId);
     const container = document.getElementById(containerId);
     
@@ -483,7 +484,8 @@ function atualizarClassificacaoVibracao(classificacao) {
 /**
  * Avança o status da FIM
  */
-function avancarStatus(registroId) {
+window.avancarStatus = function(registroId) {
+    console.log('Executando: avancarStatus() para ID:', registroId);
     if (!confirm('Deseja avançar para o próximo status? Verifique se todos os campos obrigatórios estão preenchidos.')) {
         return;
     }
@@ -500,16 +502,28 @@ function avancarStatus(registroId) {
 /**
  * Volta o status da FIM para a etapa anterior
  */
-function voltarStatus(registroId) {
-    if (!confirm('Deseja retornar para o status anterior?')) {
-        return;
-    }
+window.voltarStatus = function(registroId) {
+    console.log('--- INICIANDO VOLTAR STATUS ---');
+    console.log('ID do Registro:', registroId);
+    
+    // Removendo o confirm nativo temporariamente para teste de fluxo direto
+    const dados = { 
+        registro_id: registroId, 
+        acao: 'voltar' 
+    };
+    
+    console.log('Dados enviados via AJAX:', dados);
 
-    salvarAjax('actions/alterar_status.php', { registro_id: registroId, acao: 'voltar' }, function(data) {
-        if (data.novo_status) {
-            mostrarToast(`Status retornado para: ${formatarStatus(data.novo_status)}`, 'aviso');
-            // Recarregar página após 1.5s para atualizar visual
-            setTimeout(() => location.reload(), 1500);
+    salvarAjax('actions/alterar_status.php', dados, function(data) {
+        console.log('RESPOSTA DO SERVIDOR:', data);
+        if (data.sucesso) {
+            mostrarToast('Status retornado com sucesso!', 'sucesso');
+            setTimeout(() => {
+                window.location.href = 'formulario.php?id=' + registroId;
+            }, 1000);
+        } else {
+            console.error('ERRO NO SERVIDOR:', data.mensagem);
+            alert('Erro ao voltar status: ' + data.mensagem);
         }
     });
 }
