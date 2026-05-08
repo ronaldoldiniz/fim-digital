@@ -137,6 +137,63 @@ function salvarCliente() {
     salvarAjax('actions/salvar_cliente.php', formData);
 }
 
+/**
+ * Limpa todos os campos editáveis do formulário
+ */
+function limparFormulario() {
+    if (!confirm('Deseja realmente LIMPAR todos os campos desta tela? Esta ação não pode ser desfeita após salvar.')) {
+        return;
+    }
+
+    // Selecionar todos os inputs e selects das seções editáveis
+    const campos = document.querySelectorAll('input:not([type="hidden"]), select, textarea');
+    
+    campos.forEach(campo => {
+        if (campo.type === 'radio' || campo.type === 'checkbox') {
+            campo.checked = false;
+        } else {
+            campo.value = '';
+        }
+        
+        // Disparar evento de mudança para atualizar cálculos (desvios, etc)
+        campo.dispatchEvent(new Event('change'));
+        campo.dispatchEvent(new Event('input'));
+    });
+
+    mostrarToast('Formulário limpo com sucesso!', 'aviso');
+}
+
+/**
+ * Limpa apenas os campos de uma seção específica
+ * @param {string} containerId - ID do elemento pai (ex: collapseMedicao)
+ */
+function limparSecao(containerId) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+
+    if (!confirm('Deseja limpar apenas os campos desta seção?')) {
+        return;
+    }
+
+    const campos = container.querySelectorAll('input:not([type="hidden"]), select, textarea');
+    campos.forEach(campo => {
+        if (campo.type === 'radio' || campo.type === 'checkbox') {
+            campo.checked = false;
+        } else {
+            campo.value = '';
+        }
+        campo.dispatchEvent(new Event('change'));
+        campo.dispatchEvent(new Event('input'));
+    });
+
+    // Se for a seção de vibração, força a limpeza da classificação
+    if (containerId === 'collapseVibracao') {
+        recalcularClassificacaoVibracao();
+    }
+
+    mostrarToast('Seção limpa com sucesso!', 'aviso');
+}
+
 // ================================================================
 // CÁLCULOS AUTOMÁTICOS
 // ================================================================
