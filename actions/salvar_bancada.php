@@ -50,7 +50,7 @@ $decimais = ['pressao_negativa_mmhg','pressao_positiva_mmh2o','temperatura_c','d
     'medida_rotor_1','medida_rotor_2','medida_rotor_3','medida_rotor_4','medida_rotor_5','medida_rotor_6',
     'medida_rotor_7','medida_rotor_8','medida_rotor_9','medida_rotor_10','medida_rotor_11'];
 
-$textos = ['tensao_teste_220','tensao_teste_380','tensao_teste_440','descricao_motor','numero_serie_motor',
+$textos = ['tensao_teste_220','tensao_teste_380','tensao_teste_440','descricao_motor','numero_serie_motor','fabricante_motor',
     'tensao_motor_220','tensao_motor_380','tensao_motor_440','fator_servico','rolamento_frontal','rolamento_traseiro',
     'lubrificacao_rolamento','observacoes','observacoes_vibracao','classificacao_vibracao','tipo_fabricacao'];
 
