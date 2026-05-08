@@ -505,7 +505,7 @@ function voltarStatus(registroId) {
         return;
     }
 
-    salvarAjax('actions/alterar_status.php', { registro_id: registroId, voltar: 1 }, function(data) {
+    salvarAjax('actions/alterar_status.php', { registro_id: registroId, acao: 'voltar' }, function(data) {
         if (data.novo_status) {
             mostrarToast(`Status retornado para: ${formatarStatus(data.novo_status)}`, 'aviso');
             // Recarregar página após 1.5s para atualizar visual
