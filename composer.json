@@ -1,0 +1,7 @@
+{
+    "name": "moroto/fim-digital",
+    "description": "Ficha de Inspeção e Medição Digital",
+    "require": {
+        "mpdf/mpdf": "^8.2"
+    }
+}

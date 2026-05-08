@@ -1,0 +1,26 @@
+# FIM Digital .gitignore
+# Ignorar arquivos temporários e sensíveis
+
+# XAMPP / Windows
+Thumbs.db
+desktop.ini
+
+# PHP / Composer
+vendor/
+composer.lock
+
+# Logs e Temporários
+*.log
+tmp/
+scratch/
+
+# IDEs
+.vscode/
+.idea/
+.gemini/
+
+# Backup de Banco de Dados (opcional, se quiser manter no repo, comente a linha abaixo)
+# database.sql
+
+# Arquivos de conexão local (se você criar um db_local.php diferente do db.php)
+# config/db_local.php

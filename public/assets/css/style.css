@@ -1,0 +1,947 @@
+/**
+ * FIM Digital - Estilos Customizados
+ * Morotó Indústria e Comércio de Aspiradores Industriais
+ * Tema Industrial com cores do formulário físico
+ */
+
+/* ================================================================
+   VARIÁVEIS CSS
+   ================================================================ */
+:root {
+    /* Cores primárias */
+    --cor-primaria: #1a2332;
+    --cor-primaria-light: #2c3e50;
+    --cor-secundaria: #e67e22;
+    --cor-sucesso: #27ae60;
+    --cor-perigo: #e74c3c;
+    --cor-info: #3498db;
+
+    /* Cores do formulário físico */
+    --cor-bancada: #fff8e1;           /* Amarelo claro - bancada */
+    --cor-bancada-borda: #f9a825;     /* Amarelo forte */
+    --cor-bancada-titulo: #f57f17;    /* Amarelo escuro */
+    --cor-opcional: #e3f2fd;          /* Azul claro - opcionais */
+    --cor-opcional-borda: #42a5f5;    /* Azul médio */
+    --cor-opcional-titulo: #1565c0;   /* Azul escuro */
+    --cor-cliente: #e8f5e9;           /* Verde claro - cliente */
+    --cor-cliente-borda: #66bb6a;     /* Verde médio */
+    --cor-cliente-titulo: #2e7d32;    /* Verde escuro */
+
+    /* Vibração - cores de alerta */
+    --cor-vibracao-ok: #c8e6c9;       /* Verde - OK (A) */
+    --cor-vibracao-atencao: #fff9c4;  /* Amarelo - Atenção (B) */
+    --cor-vibracao-alerta: #ffe0b2;   /* Laranja - Alerta (C) */
+    --cor-vibracao-perigo: #ffcdd2;   /* Vermelho - Perigo (D) */
+
+    /* Desvio de corrente */
+    --cor-desvio-ok: #4caf50;
+    --cor-desvio-alerta: #ff9800;
+    --cor-desvio-perigo: #f44336;
+
+    /* Tipografia */
+    --fonte-principal: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+    /* Navbar */
+    --navbar-bg: linear-gradient(135deg, #1a2332 0%, #2c3e50 100%);
+}
+
+/* ================================================================
+   RESET E BASE
+   ================================================================ */
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: var(--fonte-principal);
+    background-color: #f0f2f5;
+    color: #333;
+    font-size: 28px;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* ================================================================
+   NAVBAR
+   ================================================================ */
+.bg-navbar {
+    background: var(--navbar-bg) !important;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+}
+
+.navbar-brand {
+    font-size: 1.2rem;
+    letter-spacing: -0.5px;
+}
+
+.nav-btn {
+    font-weight: 500;
+    padding: 0.6rem 1rem !important;
+    border-radius: 8px;
+    margin: 0 2px;
+    transition: all 0.2s ease;
+}
+
+.nav-btn:hover,
+.nav-btn.active {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+/* ================================================================
+   BOTÕES INDUSTRIAIS (mínimo 48px para uso com luvas)
+   ================================================================ */
+.btn {
+    font-weight: 500;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.btn-industrial {
+    min-height: 80px;
+    font-size: 1.8rem;
+    padding: 0.65rem 1.5rem;
+    font-weight: 600;
+    border-radius: 10px;
+    letter-spacing: 0.3px;
+}
+
+.btn-industrial-lg {
+    min-height: 56px;
+    font-size: 1.1rem;
+    padding: 0.75rem 2rem;
+}
+
+.btn-salvar {
+    background: linear-gradient(135deg, #27ae60, #2ecc71);
+    border: none;
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(39, 174, 96, 0.3);
+}
+
+.btn-salvar:hover {
+    background: linear-gradient(135deg, #219a52, #27ae60);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(39, 174, 96, 0.4);
+    color: #fff;
+}
+
+.btn-avancar {
+    background: linear-gradient(135deg, #2980b9, #3498db);
+    border: none;
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(41, 128, 185, 0.3);
+}
+
+.btn-avancar:hover {
+    background: linear-gradient(135deg, #2471a3, #2980b9);
+    transform: translateY(-1px);
+    color: #fff;
+}
+
+.btn-pdf {
+    background: linear-gradient(135deg, #c0392b, #e74c3c);
+    border: none;
+    color: #fff;
+}
+
+.btn-pdf:hover {
+    background: linear-gradient(135deg, #a93226, #c0392b);
+    color: #fff;
+}
+
+.btn-nova-fim {
+    background: linear-gradient(135deg, #e67e22, #f39c12);
+    border: none;
+    color: #fff;
+    box-shadow: 0 4px 15px rgba(230, 126, 34, 0.35);
+}
+
+.btn-nova-fim:hover {
+    background: linear-gradient(135deg, #d35400, #e67e22);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(230, 126, 34, 0.45);
+    color: #fff;
+}
+
+/* ================================================================
+   CARDS E SEÇÕES DO FORMULÁRIO
+   ================================================================ */
+.card {
+    border-radius: 12px;
+    border: none;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    transition: box-shadow 0.2s ease;
+}
+
+.card:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+/* Seção Bancada (Amarelo) */
+.secao-bancada {
+    background: var(--cor-bancada);
+    border: 2px solid var(--cor-bancada-borda);
+    border-radius: 12px;
+}
+
+.secao-bancada .card-header,
+.titulo-bancada {
+    background: linear-gradient(135deg, var(--cor-bancada-titulo), #ff8f00) !important;
+    color: #fff;
+    font-weight: 700;
+    border-radius: 10px 10px 0 0;
+    padding: 1rem 1.25rem;
+    font-size: 1.05rem;
+    letter-spacing: 0.3px;
+}
+
+/* Seção Opcional (Azul) */
+.secao-opcional {
+    background: var(--cor-opcional);
+    border: 2px solid var(--cor-opcional-borda);
+    border-radius: 12px;
+}
+
+.secao-opcional .card-header,
+.titulo-opcional {
+    background: linear-gradient(135deg, var(--cor-opcional-titulo), #1976d2) !important;
+    color: #fff;
+    font-weight: 700;
+    border-radius: 10px 10px 0 0;
+    padding: 1rem 1.25rem;
+}
+
+/* Seção Cliente (Verde) */
+.secao-cliente {
+    background: var(--cor-cliente);
+    border: 2px solid var(--cor-cliente-borda);
+    border-radius: 12px;
+}
+
+.secao-cliente .card-header,
+.titulo-cliente {
+    background: linear-gradient(135deg, var(--cor-cliente-titulo), #388e3c) !important;
+    color: #fff;
+    font-weight: 700;
+    border-radius: 10px 10px 0 0;
+    padding: 1rem 1.25rem;
+}
+
+/* Seção bloqueada (cliente antes da etapa) */
+.secao-bloqueada {
+    opacity: 0.6;
+    pointer-events: none;
+    position: relative;
+}
+
+.secao-bloqueada::after {
+    content: '🔒 Disponível na etapa AGUARDANDO CLIENTE';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0, 0, 0, 0.8);
+    color: #fff;
+    padding: 1rem 2rem;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 1rem;
+    z-index: 10;
+    white-space: nowrap;
+}
+
+/* ================================================================
+   FORMULÁRIO - INPUTS INDUSTRIAIS
+   ================================================================ */
+.form-group-compact {
+    margin-bottom: 0.5rem;
+}
+
+.input-group-compact .input-group-text {
+    padding: 0.5rem 1rem;
+    font-size: 1.7rem;
+}
+
+.input-group-text {
+    font-size: 1.8rem;
+    font-weight: 500;
+}
+
+.input-group-compact .form-control {
+    padding: 0.5rem 1rem;
+    font-size: 1.8rem;
+    min-height: 76px;
+}
+.form-control,
+.form-select {
+    border-radius: 12px;
+    border: 3px solid #dee2e6;
+    padding: 1rem 1.5rem;
+    font-size: 1.9rem;
+    min-height: 88px;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--cor-info);
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+}
+
+/* Width utilities based on character count */
+.w-char-15 {
+    max-width: 400px !important;
+}
+
+.w-char-10 {
+    max-width: 280px !important;
+}
+
+.w-char-5 {
+    max-width: 180px !important;
+}
+
+.input-group.w-char-15 {
+    width: auto !important;
+    min-width: 400px;
+}
+
+.input-group.w-char-10 {
+    width: auto !important;
+    min-width: 280px;
+}
+
+.input-group.w-char-5 {
+    width: auto !important;
+    min-width: 180px;
+}
+
+/* Input em seção amarela */
+.secao-bancada .form-control,
+.secao-bancada .form-select {
+    background: #fff;
+    border-color: var(--cor-bancada-borda);
+}
+
+.secao-bancada .form-control:focus {
+    border-color: var(--cor-bancada-titulo);
+    box-shadow: 0 0 0 3px rgba(245, 127, 23, 0.2);
+}
+
+/* Input em seção azul */
+.secao-opcional .form-control,
+.secao-opcional .form-select {
+    background: #fff;
+    border-color: var(--cor-opcional-borda);
+}
+
+/* Main Container Adjustment for full screen optimization */
+main.container-fluid {
+    max-width: 1600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+.secao-cliente .form-control,
+.secao-cliente .form-select {
+    background: #fff;
+    border-color: var(--cor-cliente-borda);
+}
+
+/* Labels */
+.form-label {
+    font-weight: 600;
+    font-size: 1.7rem;
+    color: #555;
+    margin-bottom: 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.form-label .unidade {
+    font-weight: 400;
+    color: #888;
+    text-transform: none;
+    font-size: 1.6rem;
+}
+
+/* Campo obrigatório */
+.obrigatorio::after {
+    content: ' *';
+    color: var(--cor-perigo);
+    font-weight: bold;
+}
+
+/* ================================================================
+   VIBRAÇÃO - INDICADORES VISUAIS
+   ================================================================ */
+.input-vibracao {
+    text-align: center;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+    max-width: 80px;
+    margin: 0 auto;
+    height: 38px;
+    padding: 0.25rem;
+}
+
+.vibracao-ok {
+    background-color: var(--cor-vibracao-ok) !important;
+    border-color: #4caf50 !important;
+}
+
+.vibracao-atencao {
+    background-color: var(--cor-vibracao-atencao) !important;
+    border-color: #fbc02d !important;
+}
+
+.vibracao-alerta {
+    background-color: var(--cor-vibracao-alerta) !important;
+    border-color: #ff9800 !important;
+}
+
+.vibracao-perigo {
+    background-color: var(--cor-vibracao-perigo) !important;
+    border-color: #f44336 !important;
+    color: #c62828 !important;
+    font-weight: 700 !important;
+    animation: pulsar-perigo 1.5s ease-in-out infinite;
+}
+
+@keyframes pulsar-perigo {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(244, 67, 54, 0.4); }
+    50% { box-shadow: 0 0 0 8px rgba(244, 67, 54, 0); }
+}
+
+/* ================================================================
+   DESVIO DE CORRENTE - INDICADORES
+   ================================================================ */
+.desvio-ok {
+    font-weight: 700;
+}
+
+.desvio-alerta {
+    font-weight: 700;
+    animation: pulsar-desvio 1.5s ease-in-out infinite;
+}
+
+@keyframes pulsar-desvio {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.5); opacity: 1; }
+    50% { box-shadow: 0 0 0 8px rgba(220, 53, 69, 0); opacity: 0.9; }
+}
+
+.badge-desvio {
+    font-size: 0.9rem;
+    padding: 0.4rem 0.8rem;
+    border-radius: 20px;
+}
+
+/* ================================================================
+   BARRA DE STATUS / PROGRESSO
+   ================================================================ */
+.status-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    padding: 1rem 0;
+    margin-bottom: 1.5rem;
+}
+
+.status-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    flex: 1;
+    max-width: 200px;
+}
+
+.status-step .step-circle {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1.1rem;
+    background: #e0e0e0;
+    color: #999;
+    border: 3px solid #ccc;
+    transition: all 0.3s ease;
+    z-index: 2;
+}
+
+.status-step.ativo .step-circle {
+    background: linear-gradient(135deg, #2980b9, #3498db);
+    color: #fff;
+    border-color: #2980b9;
+    box-shadow: 0 4px 12px rgba(41, 128, 185, 0.4);
+    animation: pulse-status 2s ease-in-out infinite;
+}
+
+@keyframes pulse-status {
+    0%, 100% { box-shadow: 0 4px 12px rgba(41, 128, 185, 0.4); }
+    50% { box-shadow: 0 4px 20px rgba(41, 128, 185, 0.6); }
+}
+
+.status-step.completo .step-circle {
+    background: linear-gradient(135deg, #27ae60, #2ecc71);
+    color: #fff;
+    border-color: #27ae60;
+}
+
+.status-step .step-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #999;
+    margin-top: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    text-align: center;
+}
+
+.status-step.ativo .step-label,
+.status-step.completo .step-label {
+    color: #333;
+}
+
+.status-line {
+    height: 4px;
+    flex: 1;
+    background: #e0e0e0;
+    margin: 0 -5px;
+    margin-top: -24px;
+    z-index: 1;
+}
+
+.status-line.completa {
+    background: linear-gradient(90deg, #27ae60, #2ecc71);
+}
+
+/* ================================================================
+   DASHBOARD
+   ================================================================ */
+.stat-card {
+    border-radius: 14px;
+    padding: 1.25rem;
+    color: #fff;
+    position: relative;
+    overflow: hidden;
+    min-height: 120px;
+}
+
+.stat-card::before {
+    content: '';
+    position: absolute;
+    top: -20px;
+    right: -20px;
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.stat-card .stat-numero {
+    font-size: 2.5rem;
+    font-weight: 800;
+    line-height: 1;
+}
+
+.stat-card .stat-label {
+    font-size: 0.85rem;
+    opacity: 0.9;
+    font-weight: 500;
+}
+
+.stat-bancada {
+    background: linear-gradient(135deg, #f57f17, #ff8f00);
+}
+
+.stat-montagem {
+    background: linear-gradient(135deg, #1565c0, #1976d2);
+}
+
+.stat-cliente {
+    background: linear-gradient(135deg, #2e7d32, #388e3c);
+}
+
+.stat-finalizado {
+    background: linear-gradient(135deg, #455a64, #607d8b);
+}
+
+/* ================================================================
+   TABELA DE REGISTROS
+   ================================================================ */
+.table-fim {
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.table-fim thead {
+    background: linear-gradient(135deg, var(--cor-primaria), var(--cor-primaria-light));
+    color: #fff;
+}
+
+.table-fim thead th {
+    font-weight: 600;
+    font-size: 0.82rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 0.9rem 0.75rem;
+    border: none;
+}
+
+.table-fim tbody tr {
+    transition: background-color 0.15s ease;
+    cursor: pointer;
+}
+
+.table-fim tbody tr:hover {
+    background-color: #eef2f7;
+}
+
+.table-fim tbody td {
+    padding: 0.8rem 0.75rem;
+    vertical-align: middle;
+    font-size: 0.9rem;
+}
+
+/* ================================================================
+   TABELA ISO 10816-7 (Referência visual)
+   ================================================================ */
+.tabela-iso {
+    border-radius: 10px;
+    overflow: hidden;
+    font-size: 0.8rem;
+}
+
+.tabela-iso th {
+    text-align: center;
+    font-weight: 700;
+    padding: 0.5rem;
+}
+
+.tabela-iso td {
+    text-align: center;
+    padding: 0.4rem;
+    font-weight: 600;
+}
+
+.iso-a { background-color: #c8e6c9; color: #2e7d32; }
+.iso-b { background-color: #fff9c4; color: #f57f17; }
+.iso-c { background-color: #ffe0b2; color: #e65100; }
+.iso-d { background-color: #ffcdd2; color: #c62828; }
+
+/* ================================================================
+   TOAST DE NOTIFICAÇÃO CUSTOMIZADO
+   ================================================================ */
+.toast-sucesso {
+    background: linear-gradient(135deg, #27ae60, #2ecc71) !important;
+    color: #fff !important;
+    border: none !important;
+    font-weight: 600;
+    font-size: 1rem;
+    box-shadow: 0 6px 20px rgba(39, 174, 96, 0.4);
+}
+
+.toast-erro {
+    background: linear-gradient(135deg, #c0392b, #e74c3c) !important;
+    color: #fff !important;
+    border: none !important;
+    font-weight: 600;
+    box-shadow: 0 6px 20px rgba(192, 57, 43, 0.4);
+}
+
+/* ================================================================
+   LOGIN PAGE
+   ================================================================ */
+.login-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #1a2332 0%, #2c3e50 50%, #34495e 100%);
+}
+
+.login-card {
+    background: #fff;
+    border-radius: 20px;
+    padding: 2.5rem;
+    width: 100%;
+    max-width: 420px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.login-card .logo-area {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.login-card .logo-area h1 {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--cor-primaria);
+    letter-spacing: -1px;
+}
+
+.login-card .logo-area p {
+    color: #888;
+    font-size: 0.9rem;
+}
+
+/* ================================================================
+   LINHA DO TEMPO DO EQUIPAMENTO
+   ================================================================ */
+.timeline {
+    position: relative;
+    padding-left: 30px;
+}
+
+.timeline::before {
+    content: '';
+    position: absolute;
+    left: 14px;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: #dee2e6;
+}
+
+.timeline-item {
+    position: relative;
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    background: #fff;
+    border-radius: 10px;
+    border: 1px solid #e9ecef;
+    margin-left: 15px;
+}
+
+.timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -24px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--cor-info);
+    border: 3px solid #fff;
+    box-shadow: 0 0 0 2px var(--cor-info);
+}
+
+.timeline-item.finalizado::before {
+    background: var(--cor-sucesso);
+    box-shadow: 0 0 0 2px var(--cor-sucesso);
+}
+
+/* ================================================================
+   GRID DE MEDIÇÃO (Trifásica)
+   ================================================================ */
+.grid-trifasica {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.75rem;
+}
+
+.grid-vertical {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+@media (max-width: 576px) {
+    .grid-trifasica {
+        grid-template-columns: 1fr;
+    }
+}
+
+.fase-label {
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: var(--cor-primaria);
+}
+
+/* ================================================================
+   GRID DE VIBRAÇÃO (3x3)
+   ================================================================ */
+.grid-vibracao {
+    display: grid;
+    grid-template-columns: auto repeat(3, 1fr);
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.grid-vibracao .eixo-label {
+    font-weight: 700;
+    text-align: center;
+    font-size: 1rem;
+    color: var(--cor-primaria);
+}
+
+.grid-vibracao .ponto-header {
+    text-align: center;
+    font-weight: 700;
+    font-size: 0.85rem;
+    color: #666;
+    text-transform: uppercase;
+}
+
+/* ================================================================
+   CLASSIFICAÇÃO ISO NA VIBRAÇÃO
+   ================================================================ */
+.classificacao-box {
+    text-align: center;
+    padding: 1rem;
+    border-radius: 12px;
+    font-size: 1.5rem;
+    font-weight: 800;
+    min-width: 80px;
+}
+
+.classificacao-A { background: var(--cor-vibracao-ok); color: #1b5e20; }
+.classificacao-B { background: var(--cor-vibracao-atencao); color: #f57f17; }
+.classificacao-C { background: var(--cor-vibracao-alerta); color: #e65100; }
+.classificacao-D { background: var(--cor-vibracao-perigo); color: #b71c1c; }
+
+/* ================================================================
+   BADGES CUSTOMIZADOS
+   ================================================================ */
+.bg-orange {
+    background-color: #e67e22 !important;
+    color: #fff !important;
+}
+
+.fs-7 {
+    font-size: 1.6rem !important;
+}
+
+.fs-8 {
+    font-size: 1.4rem !important;
+}
+
+/* ================================================================
+   MODAL DE CONFIRMAÇÃO
+   ================================================================ */
+.modal-vibracao .modal-header {
+    background: linear-gradient(135deg, #c62828, #e53935);
+    color: #fff;
+}
+
+.modal-vibracao .modal-body {
+    background: #fff3e0;
+    font-size: 1.1rem;
+    font-weight: 500;
+    text-align: center;
+    padding: 2rem;
+}
+
+/* ================================================================
+   RESPONSIVIDADE
+   ================================================================ */
+@media (max-width: 768px) {
+    body {
+        font-size: 15px;
+    }
+
+    .btn-industrial {
+        min-height: 52px;
+        font-size: 1.05rem;
+        width: 100%;
+    }
+
+    .form-control,
+    .form-select {
+        min-height: 48px;
+        font-size: 1rem;
+    }
+
+    .stat-card .stat-numero {
+        font-size: 2rem;
+    }
+
+    .status-bar {
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .status-line {
+        display: none;
+    }
+
+    .grid-trifasica {
+        grid-template-columns: 1fr;
+    }
+
+    .grid-vibracao {
+        grid-template-columns: auto repeat(3, 1fr);
+        gap: 0.3rem;
+    }
+
+    .secao-bloqueada::after {
+        font-size: 0.8rem;
+        white-space: normal;
+        text-align: center;
+        padding: 0.75rem 1rem;
+    }
+}
+
+/* ================================================================
+   ANIMAÇÕES
+   ================================================================ */
+.fade-in {
+    animation: fadeIn 0.4s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Efeito de salvamento */
+.salvando {
+    position: relative;
+    pointer-events: none;
+    opacity: 0.7;
+}
+
+.salvando::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.5);
+    border-radius: inherit;
+}
+
+/* ================================================================
+   IMPRESSÃO
+   ================================================================ */
+@media print {
+    .navbar, .btn, .toast-container, .status-bar {
+        display: none !important;
+    }
+
+    body {
+        background: #fff;
+        font-size: 12px;
+    }
+
+    .card {
+        box-shadow: none;
+        border: 1px solid #ddd;
+    }
+
+    .secao-bloqueada {
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+    .secao-bloqueada::after {
+        display: none;
+    }
+}
