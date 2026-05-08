@@ -168,27 +168,48 @@ function limparFormulario() {
  * @param {string} containerId - ID do elemento pai (ex: collapseMedicao)
  */
 function limparSecao(containerId) {
+    console.log('Tentando limpar seção:', containerId);
     const container = document.getElementById(containerId);
-    if (!container) return;
-
-    if (!confirm('Deseja limpar apenas os campos desta seção?')) {
+    
+    if (!container) {
+        console.error('Container não encontrado:', containerId);
         return;
     }
 
-    const campos = container.querySelectorAll('input:not([type="hidden"]), select, textarea');
+    if (!confirm('Deseja limpar todos os campos desta seção?')) {
+        return;
+    }
+
+    // Busca todos os elementos de entrada dentro do container
+    const campos = container.querySelectorAll('input, select, textarea');
+    console.log('Campos encontrados para limpar:', campos.length);
+
     campos.forEach(campo => {
+        // Ignorar campos hidden de sistema
+        if (campo.type === 'hidden' && (campo.name === 'registro_id' || campo.id === 'registro_id')) {
+            return;
+        }
+
         if (campo.type === 'radio' || campo.type === 'checkbox') {
             campo.checked = false;
         } else {
             campo.value = '';
         }
-        campo.dispatchEvent(new Event('change'));
-        campo.dispatchEvent(new Event('input'));
+        
+        // Disparar eventos para atualizar cálculos e visual
+        campo.dispatchEvent(new Event('change', { bubbles: true }));
+        campo.dispatchEvent(new Event('input', { bubbles: true }));
     });
 
-    // Se for a seção de vibração, força a limpeza da classificação
+    // Casos especiais (Vibração e Desvios)
     if (containerId === 'collapseVibracao') {
         recalcularClassificacaoVibracao();
+    }
+    
+    // Forçar atualização de desvios se os campos forem da seção de medição
+    if (containerId === 'collapseMedicao') {
+        calcularDesvioNormal();
+        calcularDesvioCarga();
     }
 
     mostrarToast('Seção limpa com sucesso!', 'aviso');
