@@ -107,7 +107,7 @@ function criarFormData(obj) {
 /**
  * Salva dados de bancada via AJAX
  */
-function salvarBancada() {
+function salvarBancada(onSuccess) {
     const form = document.getElementById('formBancada');
     if (!form) return;
 
@@ -123,18 +123,21 @@ function salvarBancada() {
         if (data.classificacao_vibracao) {
             atualizarClassificacaoVibracao(data.classificacao_vibracao);
         }
+        if (onSuccess) onSuccess(data);
     });
 }
 
 /**
  * Salva dados do cliente via AJAX
  */
-function salvarCliente() {
+function salvarCliente(onSuccess) {
     const form = document.getElementById('formCliente');
     if (!form) return;
 
     const formData = new FormData(form);
-    salvarAjax('actions/salvar_cliente.php', formData);
+    salvarAjax('actions/salvar_cliente.php', formData, function(data) {
+        if (onSuccess) onSuccess(data);
+    });
 }
 
 /**
@@ -480,25 +483,47 @@ function atualizarClassificacaoVibracao(classificacao) {
 // ================================================================
 
 /**
- * Avança o status da FIM
+ * Avança o status da FIM — salva os dados primeiro, depois avança
  */
 window.avancarStatus = function(registroId) {
     console.log('--- INICIANDO AVANÇAR STATUS ---');
     console.log('ID do Registro:', registroId);
+    console.log('Status Atual:', window.statusAtual);
 
-    // Removendo confirm para evitar bloqueio do navegador
-    salvarAjax('actions/alterar_status.php', { registro_id: registroId }, function(data) {
-        console.log('RESPOSTA DO SERVIDOR (Avançar):', data);
-        if (data.sucesso) {
-            mostrarToast('Status atualizado com sucesso!', 'sucesso');
-            setTimeout(() => {
-                window.location.href = 'formulario.php?id=' + registroId;
-            }, 1000);
+    function realmenteAvancar() {
+        salvarAjax('actions/alterar_status.php', { registro_id: registroId }, function(data) {
+            console.log('RESPOSTA DO SERVIDOR (Avançar):', data);
+            if (data.sucesso) {
+                mostrarToast('Status atualizado com sucesso!', 'sucesso');
+                setTimeout(() => {
+                    window.location.href = 'formulario.php?id=' + registroId;
+                }, 1000);
+            } else {
+                console.error('ERRO NO SERVIDOR:', data.mensagem);
+                alert('Atenção: ' + data.mensagem);
+            }
+        });
+    }
+
+    // Salvar dados da seção atual antes de avançar
+    var status = window.statusAtual;
+    if (status === 'EM_BANCADA' || status === 'EM_MONTAGEM') {
+        var form = document.getElementById('formBancada');
+        if (form) {
+            salvarBancada(realmenteAvancar);
         } else {
-            console.error('ERRO NO SERVIDOR:', data.mensagem);
-            alert('Atenção: ' + data.mensagem);
+            realmenteAvancar();
         }
-    });
+    } else if (status === 'AGUARDANDO_CLIENTE') {
+        var form = document.getElementById('formCliente');
+        if (form) {
+            salvarCliente(realmenteAvancar);
+        } else {
+            realmenteAvancar();
+        }
+    } else {
+        realmenteAvancar();
+    }
 }
 
 /**

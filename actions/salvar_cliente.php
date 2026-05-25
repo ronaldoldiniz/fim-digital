@@ -11,7 +11,7 @@ $pdo = getConnection();
 $usuario = usuarioLogado();
 $registro_id = (int)($_POST['registro_id'] ?? 0);
 
-$stmt = $pdo->prepare("SELECT status FROM registros_fim WHERE id = ?");
+$stmt = $pdo->prepare("SELECT status, equipamento_id FROM registros_fim WHERE id = ?");
 $stmt->execute([$registro_id]);
 $reg = $stmt->fetch();
 
@@ -33,6 +33,34 @@ foreach ($campos as $c) { $dados[$c] = !empty($_POST[$c]) ? trim($_POST[$c]) : n
 $dados['data_entrega'] = !empty($_POST['data_entrega']) ? $_POST['data_entrega'] : null;
 $dados['data_preenchimento'] = date('Y-m-d H:i:s');
 $dados['operador_id'] = $usuario['id'];
+
+// Salvar Nº Série do equipamento (independente do Nº Série do motor)
+if (!empty($_POST['numero_serie_equipamento']) && !empty($reg['equipamento_id'])) {
+    $serieEquip = trim($_POST['numero_serie_equipamento']);
+    $pdo->prepare("UPDATE equipamentos SET numero_serie_motor = ? WHERE id = ?")
+        ->execute([$serieEquip, $reg['equipamento_id']]);
+}
+
+// Salvar Modelo do equipamento
+if (!empty($_POST['modelo_equipamento']) && !empty($reg['equipamento_id'])) {
+    $modelo = trim($_POST['modelo_equipamento']);
+    $pdo->prepare("UPDATE equipamentos SET modelo_equipamento = ? WHERE id = ?")
+        ->execute([$modelo, $reg['equipamento_id']]);
+}
+
+// Salvar Natureza
+if (!empty($_POST['natureza']) && in_array($_POST['natureza'], ['NOVO', 'CONSERTO'])) {
+    if ($_POST['natureza'] === 'NOVO') {
+        $stmt = $pdo->prepare("SELECT COUNT(*) FROM registros_fim WHERE equipamento_id = ? AND natureza = 'NOVO' AND id != ?");
+        $stmt->execute([$reg['equipamento_id'], $registro_id]);
+        if ($stmt->fetchColumn() > 0) {
+            echo json_encode(['sucesso'=>false,'mensagem'=>'Já existe uma ficha NATUREZA: NOVO para este equipamento.']);
+            exit;
+        }
+    }
+    $pdo->prepare("UPDATE registros_fim SET natureza = ? WHERE id = ?")
+        ->execute([$_POST['natureza'], $registro_id]);
+}
 
 if ($reg['status'] === 'FINALIZADO') {
     $stmtOld = $pdo->prepare("SELECT * FROM dados_cliente WHERE registro_id = ?");

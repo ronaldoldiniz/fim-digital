@@ -65,8 +65,6 @@ if ($statusAtual === 'EM_BANCADA') {
     $temTensaoTeste = !empty($bancada['tensao_teste_220']) || !empty($bancada['tensao_teste_380']) || !empty($bancada['tensao_teste_440']);
     if (!$temTensaoTeste) $faltantes[] = 'Tensão Aplicada no Teste';
 
-    $temTensaoMotor = !empty($bancada['tensao_motor_220']) || !empty($bancada['tensao_motor_380']) || !empty($bancada['tensao_motor_440']);
-    if (!$temTensaoMotor) $faltantes[] = 'Tensão do Cliente';
     if (!empty($faltantes)) {
         echo json_encode(['sucesso'=>false,'mensagem'=>'Campos obrigatórios faltantes: '.implode(', ',$faltantes)]);
         exit;

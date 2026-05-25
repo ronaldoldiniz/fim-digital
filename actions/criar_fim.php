@@ -124,6 +124,17 @@ try {
         $equipamento_id = $pdo->lastInsertId();
     }
 
+    // Impedir duplicidade de NATUREZA: NOVO para o mesmo equipamento
+    if ($natureza === 'NOVO') {
+        $stmt = $pdo->prepare("SELECT COUNT(*) FROM registros_fim WHERE equipamento_id = ? AND natureza = 'NOVO'");
+        $stmt->execute([$equipamento_id]);
+        if ($stmt->fetchColumn() > 0) {
+            $pdo->rollBack();
+            echo json_encode(['sucesso' => false, 'mensagem' => 'Já existe uma ficha NATUREZA: NOVO para este equipamento.']);
+            exit;
+        }
+    }
+
     // Criar registro FIM
     $stmt = $pdo->prepare("
         INSERT INTO registros_fim (equipamento_id, natureza, numero_conserto, status, operador_inicio_id)

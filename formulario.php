@@ -59,7 +59,7 @@ $stmtC->execute([$registro_id]);
 $cliente = $stmtC->fetch() ?: [];
 
 $finalizado = ($reg['status'] === 'FINALIZADO');
-$somosLeitura = $finalizado && !isGestor();
+$somosLeitura = $finalizado;
 
 headerHTML('FIM: ' . $reg['id_interno'], 'formulario');
 ?>
@@ -74,15 +74,23 @@ headerHTML('FIM: ' . $reg['id_interno'], 'formulario');
         </div>
     </div>
     <div class="col-md-6 text-md-end mt-3 mt-md-0 d-flex justify-content-md-end gap-2">
-        <button type="button" class="btn btn-outline-danger btn-industrial" onclick="console.log('Clique: Limpar Tudo'); limparFormulario()">
-            <i class="bi bi-trash"></i> Limpar Tudo
-        </button>
+        <?php if (in_array($reg['status'], ['EM_BANCADA', 'EM_MONTAGEM'])): ?>
+            <button type="button" class="btn btn-outline-danger btn-industrial" onclick="console.log('Clique: Limpar Tudo'); limparFormulario()">
+                <i class="bi bi-trash"></i> Limpar Tudo
+            </button>
+        <?php endif; ?>
         <a href="index.php" class="btn btn-outline-secondary btn-industrial">
             <i class="bi bi-arrow-left"></i> Voltar
         </a>
         <?php if ($finalizado): ?>
+            <button type="button" class="btn btn-info btn-industrial" onclick="window.print()">
+                <i class="bi bi-printer"></i> Imprimir
+            </button>
             <a href="reports/visualizar_fim.php?id=<?= $reg['id'] ?>" target="_blank" class="btn btn-info btn-industrial">
-                <i class="bi bi-printer"></i> Imprimir / PDF
+                <i class="bi bi-file-pdf"></i> PDF Completo
+            </a>
+            <a href="reports/visualizar_fim.php?id=<?= $reg['id'] ?>&cliente=1" target="_blank" class="btn btn-success btn-industrial">
+                <i class="bi bi-person"></i> PDF Cliente
             </a>
         <?php endif; ?>
         <?php if ($reg['status'] !== 'EM_BANCADA'): ?>
@@ -139,7 +147,14 @@ headerHTML('FIM: ' . $reg['id_interno'], 'formulario');
                     </div>
                     <div class="col-md-2">
                         <label class="form-label fs-7">Natureza</label>
+                        <?php if ($reg['status'] === 'AGUARDANDO_CLIENTE' && !$somosLeitura): ?>
+                        <select class="form-select form-select-sm" name="natureza">
+                            <option value="NOVO" <?= $reg['natureza'] === 'NOVO' ? 'selected' : '' ?>>NOVO</option>
+                            <option value="CONSERTO" <?= $reg['natureza'] === 'CONSERTO' ? 'selected' : '' ?>>CONSERTO</option>
+                        </select>
+                        <?php else: ?>
                         <input type="text" class="form-control form-control-sm bg-light" value="<?= $reg['natureza'] ?>" readonly>
+                        <?php endif; ?>
                     </div>
                     <?php if($reg['natureza'] === 'CONSERTO'): ?>
                         <div class="col-md-2">
@@ -149,7 +164,7 @@ headerHTML('FIM: ' . $reg['id_interno'], 'formulario');
                     <?php endif; ?>
                     <div class="col-md-2">
                         <label class="form-label fs-7">Nº Série</label>
-                        <input type="text" class="form-control form-control-sm bg-light" value="<?= sanitizar($reg['numero_serie_motor'] ?: 'Sem Número') ?>" readonly>
+                        <input type="text" class="form-control form-control-sm<?= $reg['status'] === 'FINALIZADO' ? ' bg-light' : '' ?>" name="numero_serie_equipamento" value="<?= sanitizar($reg['numero_serie_motor'] ?: 'Sem Número') ?>" <?= ($somosLeitura || $reg['status'] === 'FINALIZADO') ? 'readonly' : '' ?>>
                     </div>
                     <div class="col-md-2">
                         <label class="form-label fs-7">Nº Nota Fiscal</label>
@@ -157,7 +172,7 @@ headerHTML('FIM: ' . $reg['id_interno'], 'formulario');
                     </div>
                     <div class="col-md-3">
                         <label class="form-label fs-7">Modelo</label>
-                        <input type="text" class="form-control form-control-sm bg-light" value="<?= sanitizar($reg['modelo_equipamento']) ?>" readonly>
+                        <input type="text" class="form-control form-control-sm<?= $reg['status'] === 'FINALIZADO' ? ' bg-light' : '' ?>" name="modelo_equipamento" value="<?= sanitizar($reg['modelo_equipamento']) ?>" <?= ($somosLeitura || $reg['status'] === 'FINALIZADO') ? 'readonly' : '' ?>>
                     </div>
                     <div class="col-md-3">
                         <label class="form-label fs-7">Data Registro</label>
@@ -179,7 +194,6 @@ headerHTML('FIM: ' . $reg['id_interno'], 'formulario');
                 <strong>Dados Fixos:</strong>
                 <div class="row mt-2 g-2">
                     <div class="col-md-3"><strong>Natureza:</strong> <?= $reg['natureza'] ?> <?= $reg['natureza'] === 'CONSERTO' ? '(Nº '.$reg['numero_conserto'].')' : '' ?></div>
-                    <div class="col-md-3"><strong>Nº Série:</strong> <?= sanitizar($reg['numero_serie_motor'] ?: 'Sem Número') ?></div>
                     <div class="col-md-3"><strong>Modelo:</strong> <?= sanitizar($reg['modelo_equipamento']) ?></div>
                     <div class="col-md-3"><strong>Data Abertura:</strong> <?= formatarData($reg['data_inicio']) ?></div>
                 </div>
@@ -527,7 +541,7 @@ headerHTML('FIM: ' . $reg['id_interno'], 'formulario');
                     </div>
                     <div class="col-lg-3">
                         <label class="form-label obrigatorio fs-7">Nº Série</label>
-                        <input type="text" class="form-control" name="numero_serie_motor" value="<?= sanitizar($bancada['numero_serie_motor'] ?? $reg['numero_serie_motor'] ?? '') ?>" <?= $somosLeitura ? 'readonly' : '' ?>>
+                        <input type="text" class="form-control" name="numero_serie_motor" value="<?= sanitizar($bancada['numero_serie_motor'] ?? '') ?>" <?= ($somosLeitura || $reg['status'] === 'FINALIZADO') ? 'readonly' : '' ?>>
                     </div>
                     <div class="col-lg-3">
                         <label class="form-label fs-7">Fabricação</label>
@@ -558,7 +572,7 @@ headerHTML('FIM: ' . $reg['id_interno'], 'formulario');
                     </div>
                     <div class="col-lg-3">
                         <label class="form-label fs-7">F.S. (Fator de Serviço)</label>
-                        <input type="number" step="0.01" class="form-control" name="fator_servico" value="<?= sanitizar($bancada['fator_servico'] ?? '') ?>" <?= $somosLeitura ? 'readonly' : '' ?>>
+                        <input type="text" inputmode="decimal" class="form-control" name="fator_servico" value="<?= sanitizar($bancada['fator_servico'] ?? '') ?>" <?= $somosLeitura ? 'readonly' : '' ?>>
                     </div>
                 </div>
 
@@ -761,6 +775,7 @@ headerHTML('FIM: ' . $reg['id_interno'], 'formulario');
         </div>
     </div>
 
+    <?php if ($reg['status'] !== 'EM_BANCADA'): ?>
     <!-- NA UTILIZAÇÃO -->
         <div class="card-header titulo-bancada d-flex justify-content-between align-items-center py-2">
             <div class="flex-grow-1" data-bs-toggle="collapse" data-bs-target="#collapseUtilizacao" style="cursor:pointer">
@@ -803,11 +818,27 @@ headerHTML('FIM: ' . $reg['id_interno'], 'formulario');
             <?php endif; ?>
         </div>
     </div>
+    <?php endif; ?>
 </form>
 
 <script>
+window.statusAtual = '<?= $reg['status'] ?>';
+
 // JS Específico do formulário
 document.addEventListener('DOMContentLoaded', function() {
+    // Permitir desmarcar radios Tensão Motor clicando novamente
+    document.querySelectorAll('input[type="radio"][name="tensao_motor_unica"]').forEach(function(el) {
+        el.dataset.wasChecked = el.checked ? 'true' : 'false';
+        el.addEventListener('click', function() {
+            if (this.dataset.wasChecked === 'true') {
+                this.checked = false;
+            }
+            document.querySelectorAll('input[type="radio"][name="tensao_motor_unica"]').forEach(function(r) {
+                r.dataset.wasChecked = r.checked ? 'true' : 'false';
+            });
+        });
+    });
+
     // Conversão CV para kW visual
     const potCV = document.getElementById('potencia_cv');
     const potKW = document.getElementById('potencia_kw_show');

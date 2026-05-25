@@ -65,6 +65,14 @@ foreach ($textos as $campo) {
     $dados[$campo] = ($val !== null && trim($val) !== '') ? trim($val) : null;
 }
 
+// Validar que nenhum campo numérico tenha valor negativo
+foreach ($decimais as $campo) {
+    if ($dados[$campo] !== null && $dados[$campo] < 0) {
+        echo json_encode(['sucesso' => false, 'mensagem' => "O campo {$campo} não pode ter valor negativo."]);
+        exit;
+    }
+}
+
 // Frequência Única (Rádio)
 $freq = $_POST['frequencia_unica'] ?? null;
 $dados['frequencia_50hz'] = ($freq === '50') ? 1 : 0;
@@ -138,12 +146,6 @@ try {
     $sql = "UPDATE dados_bancada SET " . implode(', ', $sets) . " WHERE registro_id = ?";
     $stmt = $pdo->prepare($sql);
     $stmt->execute($params);
-
-    // Sincronizar o número de série do motor com a tabela equipamentos para exibição no Dashboard
-    if (!empty($dados['numero_serie_motor']) && !empty($reg['equipamento_id'])) {
-        $pdo->prepare("UPDATE equipamentos SET numero_serie_motor = ? WHERE id = ?")
-            ->execute([$dados['numero_serie_motor'], $reg['equipamento_id']]);
-    }
 
     echo json_encode([
         'sucesso' => true,

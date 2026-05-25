@@ -39,9 +39,6 @@ $params = [];
 if ($filtroStatus && $filtroStatus !== 'TODOS') {
     $where[] = "r.status = ?";
     $params[] = $filtroStatus;
-} else {
-    // Por padrão, mostrar apenas FIMs em aberto
-    $where[] = "r.status != 'FINALIZADO'";
 }
 
 if ($filtroData) {
@@ -50,20 +47,22 @@ if ($filtroData) {
 }
 
 if ($filtroBusca) {
-    $where[] = "(e.numero_serie_motor LIKE ? OR e.id_interno LIKE ? OR r.numero_conserto LIKE ? OR dc.nome_cliente LIKE ?)";
+    $where[] = "(e.numero_serie_motor LIKE ? OR e.id_interno LIKE ? OR r.numero_conserto LIKE ? OR dc.nome_cliente LIKE ? OR db.numero_serie_motor LIKE ?)";
     $busca = '%' . $filtroBusca . '%';
-    $params = array_merge($params, [$busca, $busca, $busca, $busca]);
+    $params = array_merge($params, [$busca, $busca, $busca, $busca, $busca]);
 }
 
 $whereSQL = implode(' AND ', $where);
 
 $stmt = $pdo->prepare("
-    SELECT r.*, e.numero_serie_motor, e.id_interno, e.modelo_equipamento,
+    SELECT r.*, e.numero_serie_motor as serie_equipamento, e.id_interno, e.modelo_equipamento,
+           db.numero_serie_motor as serie_motor,
            u.nome as operador_nome, dc.nome_cliente
     FROM registros_fim r
     JOIN equipamentos e ON r.equipamento_id = e.id
     JOIN usuarios u ON r.operador_inicio_id = u.id
     LEFT JOIN dados_cliente dc ON dc.registro_id = r.id
+    LEFT JOIN dados_bancada db ON db.registro_id = r.id
     WHERE {$whereSQL}
     ORDER BY 
         CASE r.status 
@@ -150,6 +149,7 @@ headerHTML('Dashboard', 'dashboard');
                 <thead>
                     <tr>
                         <th>ID Interno</th>
+                        <th>Nº Série Equip.</th>
                         <th>Nº Série Motor</th>
                         <th>Modelo</th>
                         <th>Natureza</th>
@@ -164,7 +164,7 @@ headerHTML('Dashboard', 'dashboard');
                 <tbody>
                     <?php if (empty($registros)): ?>
                         <tr>
-                            <td colspan="10" class="text-center py-5 text-muted">
+                            <td colspan="11" class="text-center py-5 text-muted">
                                 <i class="bi bi-inbox fs-1 d-block mb-2"></i>
                                 Nenhuma FIM encontrada com os filtros atuais.
                             </td>
@@ -173,7 +173,8 @@ headerHTML('Dashboard', 'dashboard');
                         <?php foreach ($registros as $r): ?>
                             <tr onclick="window.location='formulario.php?id=<?= $r['id'] ?>'" style="cursor:pointer;">
                                 <td><strong><?= sanitizar($r['id_interno']) ?></strong></td>
-                                <td><?= sanitizar($r['numero_serie_motor']) ?: '<span class="text-muted">-</span>' ?></td>
+                                <td><?= sanitizar($r['serie_equipamento']) ?: '<span class="text-muted">-</span>' ?></td>
+                                <td><?= sanitizar($r['serie_motor']) ?: '<span class="text-muted">-</span>' ?></td>
                                 <td><?= sanitizar($r['modelo_equipamento']) ?: '-' ?></td>
                                 <td><?= badgeNatureza($r['natureza']) ?></td>
                                 <td><?= sanitizar($r['numero_conserto']) ?: '-' ?></td>

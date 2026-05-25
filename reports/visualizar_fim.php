@@ -11,6 +11,7 @@ $registro_id = (int)($_GET['id'] ?? 0);
 if (!$registro_id) die('ID não informado.');
 
 $pdo = getConnection();
+$modoCliente = isset($_GET['cliente']);
 
 // Buscar Registro e Equipamento
 $stmt = $pdo->prepare("
@@ -26,7 +27,7 @@ $reg = $stmt->fetch();
 if (!$reg) die('Registro não encontrado.');
 
 // Buscar Dados de Bancada
-$stmtB = $pdo->prepare("SELECT * FROM dados_bancada WHERE registro_id = ?");
+$stmtB = $pdo->prepare("SELECT b.*, u.nome as operador_medicao FROM dados_bancada b LEFT JOIN usuarios u ON b.operador_id = u.id WHERE b.registro_id = ?");
 $stmtB->execute([$registro_id]);
 $b = $stmtB->fetch() ?: [];
 
@@ -49,27 +50,27 @@ function f2($val) {
     <meta charset="UTF-8">
     <title>FIM - <?= $reg['id_interno'] ?></title>
     <style>
-        @page { size: A4; margin: 1cm; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 11pt; line-height: 1.3; color: #000; margin: 0; padding: 0; }
+        @page { size: A4 portrait; margin: 0.7cm; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 9pt; line-height: 1.2; color: #000; margin: 0; padding: 0; }
         
-        .no-print { background: #f8f9fa; padding: 10px; text-align: center; border-bottom: 1px solid #ddd; margin-bottom: 20px; }
-        .btn-print { padding: 10px 20px; background: #27ae60; color: #fff; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        .no-print { background: #f8f9fa; padding: 8px; text-align: center; border-bottom: 1px solid #ddd; margin-bottom: 8px; }
+        .btn-print { padding: 6px 14px; background: #27ae60; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 9pt; }
 
         .container { width: 100%; max-width: 21cm; margin: 0 auto; background: #fff; }
         
-        table { width: 100%; border-collapse: collapse; margin-bottom: 10px; }
-        th, td { border: 1px solid #333; padding: 6px 10px; vertical-align: middle; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 4px; }
+        th, td { border: 1px solid #333; padding: 3px 5px; vertical-align: middle; }
         
-        .header-logo { text-align: center; font-weight: 800; font-size: 16pt; width: 25%; }
-        .header-title { text-align: center; font-weight: 800; font-size: 14pt; background: #f2f2f2; }
-        .header-info { text-align: center; font-size: 9pt; width: 20%; }
+        .header-logo { text-align: center; font-weight: 800; font-size: 12pt; width: 25%; }
+        .header-title { text-align: center; font-weight: 800; font-size: 11pt; background: #f2f2f2; }
+        .header-info { text-align: center; font-size: 8pt; width: 20%; }
 
-        .section-title { background: #eee; font-weight: bold; text-transform: uppercase; font-size: 10pt; }
+        .section-title { background: #eee; font-weight: bold; text-transform: uppercase; font-size: 8pt; }
         .bg-green { background-color: #e8f5e9; }
         .bg-yellow { background-color: #fffde7; }
         
-        .label { font-size: 9pt; color: #555; display: block; margin-bottom: 2px; text-transform: uppercase; font-weight: bold; }
-        .value { font-size: 11pt; font-weight: bold; }
+        .label { font-size: 7pt; color: #555; display: block; margin-bottom: 1px; text-transform: uppercase; font-weight: bold; }
+        .value { font-size: 9pt; font-weight: bold; }
         
         .text-center { text-align: center; }
         .bold { font-weight: bold; }
@@ -108,12 +109,12 @@ function f2($val) {
                 <div class="value"><?= sanitizar($c['nome_cliente'] ?? 'NÃO INFORMADO') ?></div>
             </td>
             <td width="20%">
-                <span class="label">Natureza</span>
-                <div class="value"><?= $reg['natureza'] ?> <?= $reg['numero_conserto'] ? '('.$reg['numero_conserto'].')' : '' ?></div>
+                <span class="label">Nº Série</span>
+                <div class="value"><?= sanitizar($reg['e_serie'] ?: '---') ?></div>
             </td>
             <td width="20%">
-                <span class="label">Nº Série Motor</span>
-                <div class="value"><?= sanitizar($b['numero_serie_motor'] ?: $reg['e_serie'] ?: '---') ?></div>
+                <span class="label">Nº NF</span>
+                <div class="value"><?= sanitizar($c['numero_nota_fiscal'] ?? '---') ?></div>
             </td>
         </tr>
         <tr>
@@ -122,8 +123,8 @@ function f2($val) {
                 <div class="value"><?= sanitizar($reg['modelo_equipamento'] ?: '---') ?></div>
             </td>
             <td width="20%">
-                <span class="label">Nº Pedido / NF</span>
-                <div class="value"><?= sanitizar($c['numero_pedido'] ?? '---') ?> / <?= sanitizar($c['numero_nota_fiscal'] ?? '---') ?></div>
+                <span class="label">Natureza</span>
+                <div class="value"><?= $reg['natureza'] ?> <?= $reg['numero_conserto'] ? '('.$reg['numero_conserto'].')' : '' ?></div>
             </td>
             <td colspan="2">
                 <span class="label">Data de Início da Inspeção</span>
@@ -136,21 +137,19 @@ function f2($val) {
     <table>
         <tr><td colspan="4" class="section-title bg-yellow">2. INSPEÇÃO E MEDIÇÃO: NA GERAÇÃO</td></tr>
         <tr>
-            <td colspan="4">
+            <td width="30%">
                 <span class="label">Tensão de Teste</span>
                 <div class="value">
-                    [<?= $b['tensao_teste_220'] ? ' X ' : '&nbsp;&nbsp;&nbsp;' ?>] 220V &nbsp;&nbsp;&nbsp;
-                    [<?= $b['tensao_teste_380'] ? ' X ' : '&nbsp;&nbsp;&nbsp;' ?>] 380V &nbsp;&nbsp;&nbsp;
+                    [<?= $b['tensao_teste_220'] ? ' X ' : '&nbsp;&nbsp;&nbsp;' ?>] 220V &nbsp;
+                    [<?= $b['tensao_teste_380'] ? ' X ' : '&nbsp;&nbsp;&nbsp;' ?>] 380V &nbsp;
                     [<?= $b['tensao_teste_440'] ? ' X ' : '&nbsp;&nbsp;&nbsp;' ?>] 440V
                 </div>
             </td>
-        </tr>
-        <tr>
             <td width="25%">
                 <span class="label">Pressão Negativa</span>
                 <div class="value"><?= f1($b['pressao_negativa_mmhg']) ?> mmHg</div>
             </td>
-            <td width="25%">
+            <td width="20%">
                 <span class="label">Pressão Positiva</span>
                 <div class="value"><?= f1($b['pressao_positiva_mmh2o']) ?> mmH2O</div>
             </td>
@@ -158,21 +157,17 @@ function f2($val) {
                 <span class="label">Temperatura</span>
                 <div class="value"><?= f1($b['temperatura_c']) ?> °C</div>
             </td>
-            <td width="25%">
-                <span class="label">Diâmetro</span>
-                <div class="value"><?= f1($b['diametro_mm']) ?> mm</div>
-            </td>
         </tr>
         <tr>
+            <?php if (!$modoCliente): ?>
             <td>
                 <span class="label">Vazão</span>
                 <div class="value"><?= f1($b['vazao_m3min']) ?> m³/min</div>
             </td>
-            <td>
-                <span class="label">Ruído</span>
-                <div class="value"><?= f1($b['ruido_db']) ?> dB</div>
-            </td>
-            <td colspan="2">
+            <td colspan="<?= $modoCliente ? 4 : 3 ?>">
+            <?php else: ?>
+            <td colspan="4">
+            <?php endif; ?>
                 <span class="label">Folgas do Rotor</span>
                 <div class="value">Radial: <?= f1($b['folga_radial_mm']) ?> mm | Axial: <?= f1($b['folga_axial_mm']) ?> mm</div>
             </td>
@@ -188,7 +183,7 @@ function f2($val) {
                     S: <?= f1($b['corrente_normal_fase_s']) ?> | 
                     T: <?= f1($b['corrente_normal_fase_t']) ?>
                 </div>
-                <div class="text-center label">Desvio: <?= f2($b['desvio_normal']) ?>%</div>
+                <?php if (!$modoCliente): ?><div class="text-center label">Desvio: <?= f2($b['desvio_normal']) ?>%</div><?php endif; ?>
             </td>
             <td colspan="2">
                 <div class="text-center value">
@@ -196,7 +191,7 @@ function f2($val) {
                     S: <?= f1($b['corrente_carga_fase_s']) ?> | 
                     T: <?= f1($b['corrente_carga_fase_t']) ?>
                 </div>
-                <div class="text-center label">Desvio: <?= f2($b['desvio_carga']) ?>%</div>
+                <?php if (!$modoCliente): ?><div class="text-center label">Desvio: <?= f2($b['desvio_carga']) ?>%</div><?php endif; ?>
             </td>
         </tr>
         <tr>
@@ -229,48 +224,46 @@ function f2($val) {
             </td>
         </tr>
         <tr>
-            <td colspan="2">
+            <td width="30%">
                 <span class="label">Tensão Aplicação</span>
                 <div class="value">
-                    [<?= $b['tensao_motor_220'] ? ' X ' : '&nbsp;&nbsp;&nbsp;' ?>] 220V &nbsp;&nbsp;
-                    [<?= $b['tensao_motor_380'] ? ' X ' : '&nbsp;&nbsp;&nbsp;' ?>] 380V &nbsp;&nbsp;
+                    [<?= $b['tensao_motor_220'] ? ' X ' : '&nbsp;&nbsp;&nbsp;' ?>] 220V &nbsp;
+                    [<?= $b['tensao_motor_380'] ? ' X ' : '&nbsp;&nbsp;&nbsp;' ?>] 380V &nbsp;
                     [<?= $b['tensao_motor_440'] ? ' X ' : '&nbsp;&nbsp;&nbsp;' ?>] 440V
                 </div>
             </td>
-            <td colspan="2">
+            <td width="20%">
                 <span class="label">Frequência</span>
                 <div class="value">
-                    [<?= $b['frequencia_50hz'] ? ' X ' : '&nbsp;&nbsp;&nbsp;' ?>] 50Hz &nbsp;&nbsp;&nbsp;&nbsp;
+                    [<?= $b['frequencia_50hz'] ? ' X ' : '&nbsp;&nbsp;&nbsp;' ?>] 50Hz &nbsp;
                     [<?= $b['frequencia_60hz'] ? ' X ' : '&nbsp;&nbsp;&nbsp;' ?>] 60Hz
                 </div>
             </td>
-        </tr>
-        <tr>
-            <td>
+            <td width="20%">
                 <span class="label">Potência</span>
                 <div class="value"><?= f1($b['potencia_cv']) ?> CV / <?= f1($b['potencia_kw']) ?> kW</div>
             </td>
-            <td>
+            <td width="30%">
                 <span class="label">Fator de Serviço</span>
                 <div class="value"><?= $b['fator_servico'] ?: '---' ?></div>
             </td>
-            <td colspan="2">
-                <span class="label">Corrente Nominal</span>
-                <div class="value">220V: <?= f1($b['corrente_nominal_220']) ?>A | 380V: <?= f1($b['corrente_nominal_380']) ?>A | 440V: <?= f1($b['corrente_nominal_440']) ?>A</div>
-            </td>
         </tr>
         <tr>
-            <td>
+            <td width="30%">
                 <span class="label">Rol. Frontal</span>
                 <div class="value"><?= sanitizar($b['rolamento_frontal'] ?? '---') ?></div>
             </td>
-            <td>
+            <td width="20%">
                 <span class="label">Rol. Traseiro</span>
                 <div class="value"><?= sanitizar($b['rolamento_traseiro'] ?? '---') ?></div>
             </td>
-            <td colspan="2">
+            <td width="20%">
                 <span class="label">Lubrificação</span>
                 <div class="value"><?= sanitizar($b['lubrificacao_rolamento'] ?? '---') ?></div>
+            </td>
+            <td width="30%">
+                <span class="label">Corrente Nominal</span>
+                <div class="value">220V: <?= f1($b['corrente_nominal_220']) ?>A | 380V: <?= f1($b['corrente_nominal_380']) ?>A | 440V: <?= f1($b['corrente_nominal_440']) ?>A</div>
             </td>
         </tr>
     </table>
@@ -282,51 +275,52 @@ function f2($val) {
             <td width="25%"><span class="label">Ponto 1 (X | Y | Z)</span><div class="value"><?= f1($b['vibracao_x1']) ?> | <?= f1($b['vibracao_y1']) ?> | <?= f1($b['vibracao_z1']) ?></div></td>
             <td width="25%"><span class="label">Ponto 2 (X | Y | Z)</span><div class="value"><?= f1($b['vibracao_x2']) ?> | <?= f1($b['vibracao_y2']) ?> | <?= f1($b['vibracao_z2']) ?></div></td>
             <td width="25%"><span class="label">Ponto 3 (X | Y | Z)</span><div class="value"><?= f1($b['vibracao_x3']) ?> | <?= f1($b['vibracao_y3']) ?> | <?= f1($b['vibracao_z3']) ?></div></td>
-            <td width="25%"><span class="label">Classificação Final</span><div class="value" style="font-size: 14pt;"><?= $b['classificacao_vibracao'] ?: '---' ?></div></td>
+            <td width="25%"><span class="label">Classificação Final</span><div class="value" style="font-size: 11pt;"><?= $b['classificacao_vibracao'] ?: '---' ?></div></td>
+        </tr>
+        <tr>
+            <td colspan="4" style="text-align: center; padding: 4px;">
+                <img src="../assets/image/pontosMedicao.PNG" style="max-height: 80px; width: auto;">
+            </td>
         </tr>
     </table>
 
+    <?php if ($reg['status'] !== 'EM_BANCADA' && !$modoCliente): ?>
     <!-- UTILIZAÇÃO -->
     <table>
-        <tr><td colspan="3" class="section-title bg-yellow">5. NA UTILIZAÇÃO</td></tr>
+        <tr><td colspan="4" class="section-title bg-yellow">5. NA UTILIZAÇÃO</td></tr>
         <tr>
-            <td width="33%">
+            <td width="25%">
                 <span class="label">Pressão de Utilização</span>
                 <div class="value"><?= f1($b['pressao_utilizacao_mmhg']) ?> mmHg</div>
             </td>
-            <td width="33%">
+            <td width="25%">
                 <span class="label">Rotor</span>
                 <div class="value">Ø <?= f1($b['rotor_diametro']) ?> mm | Esp: <?= f1($b['rotor_espessura']) ?> mm</div>
             </td>
-            <td width="33%">
+            <td width="25%">
+                <span class="label">Ruído</span>
+                <div class="value"><?= f1($b['ruido_db']) ?> dB</div>
+            </td>
+            <td width="25%">
                 <span class="label">Tipo de Fabricação</span>
                 <div class="value"><?= $b['tipo_fabricacao'] ?: '---' ?></div>
             </td>
         </tr>
     </table>
+    <?php endif; ?>
 
     <!-- OBSERVAÇÕES E ASSINATURA -->
     <table>
         <tr><td class="section-title">6. OBSERVAÇÕES GERAIS</td></tr>
         <tr>
-            <td style="min-height: 80px; vertical-align: top;">
+            <td style="min-height: 30px; vertical-align: top;">
                 <?= nl2br(sanitizar($b['observacoes'] ?? 'SEM OBSERVAÇÕES ADICIONAIS.')) ?>
+                <br><br>
+                <strong>Medições realizadas por:</strong> <?= sanitizar($b['operador_medicao'] ?? '---') ?>
             </td>
         </tr>
     </table>
 
-    <table style="margin-top: 30px; border: none;">
-        <tr style="border: none;">
-            <td width="50%" style="border: none; text-align: center;">
-                <div style="border-top: 1px solid #000; width: 80%; margin: 30px auto 0;"></div>
-                <span class="label">Morotó Indústria e Comércio</span>
-            </td>
-            <td width="50%" style="border: none; text-align: center;">
-                <div style="border-top: 1px solid #000; width: 80%; margin: 30px auto 0;"></div>
-                <span class="label">Responsável Técnico: <?= sanitizar($reg['responsavel'] ?: '____________________') ?></span>
-            </td>
-        </tr>
-    </table>
 </div>
 
 <script>
