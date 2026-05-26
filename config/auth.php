@@ -113,7 +113,8 @@ function buscarUsuarioPorEmail(string $email): array|false {
 function gerarTokenRedefinicao(int $usuario_id): string|false {
     $pdo = getConnection();
     $token = bin2hex(random_bytes(32));
-    $expires = date('Y-m-d H:i:s', strtotime('+1 hour'));
+    // Usar UTC para evitar diferença de timezone entre PHP e MySQL
+    $expires = gmdate('Y-m-d H:i:s', strtotime('+1 hour'));
     $stmt = $pdo->prepare("INSERT INTO password_resets (usuario_id, token, expires_at) VALUES (?, ?, ?)");
     if ($stmt->execute([$usuario_id, $token, $expires])) {
         return $token;
@@ -130,7 +131,7 @@ function validarTokenRedefinicao(string $token): array|false {
         SELECT pr.*, u.id as user_id, u.nome, u.login, u.email
         FROM password_resets pr
         JOIN usuarios u ON pr.usuario_id = u.id
-        WHERE pr.token = ? AND pr.used_at IS NULL AND pr.expires_at > NOW()
+        WHERE pr.token = ? AND pr.used_at IS NULL AND pr.expires_at > UTC_TIMESTAMP()
         LIMIT 1
     ");
     $stmt->execute([$token]);

@@ -14,9 +14,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $id = (int)($_POST['id'] ?? 0);
     $nome = trim($_POST['nome'] ?? '');
     $login = trim($_POST['login'] ?? '');
+    $email = trim($_POST['email'] ?? '');
     $senha = $_POST['senha'] ?? '';
     $perfil = $_POST['perfil'] ?? 'OPERADOR';
     $ativo = isset($_POST['ativo']) ? 1 : 0;
+    if ($email === '') $email = null;
 
     if (!$nome || !$login || (!$id && !$senha)) {
         $erro = 'Preencha todos os campos obrigatórios.';
@@ -26,22 +28,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 // Update
                 if ($senha) {
                     $hash = password_hash($senha, PASSWORD_DEFAULT);
-                    $stmt = $pdo->prepare("UPDATE usuarios SET nome=?, login=?, senha_hash=?, perfil=?, ativo=? WHERE id=?");
-                    $stmt->execute([$nome, $login, $hash, $perfil, $ativo, $id]);
+                    $stmt = $pdo->prepare("UPDATE usuarios SET nome=?, login=?, email=?, senha_hash=?, perfil=?, ativo=? WHERE id=?");
+                    $stmt->execute([$nome, $login, $email, $hash, $perfil, $ativo, $id]);
                 } else {
-                    $stmt = $pdo->prepare("UPDATE usuarios SET nome=?, login=?, perfil=?, ativo=? WHERE id=?");
-                    $stmt->execute([$nome, $login, $perfil, $ativo, $id]);
+                    $stmt = $pdo->prepare("UPDATE usuarios SET nome=?, login=?, email=?, perfil=?, ativo=? WHERE id=?");
+                    $stmt->execute([$nome, $login, $email, $perfil, $ativo, $id]);
                 }
                 $sucesso = 'Usuário atualizado com sucesso!';
             } else {
                 // Insert
                 $hash = password_hash($senha, PASSWORD_DEFAULT);
-                $stmt = $pdo->prepare("INSERT INTO usuarios (nome, login, senha_hash, perfil, ativo) VALUES (?,?,?,?,?)");
-                $stmt->execute([$nome, $login, $hash, $perfil, $ativo]);
+                $stmt = $pdo->prepare("INSERT INTO usuarios (nome, login, email, senha_hash, perfil, ativo) VALUES (?,?,?,?,?,?)");
+                $stmt->execute([$nome, $login, $email, $hash, $perfil, $ativo]);
                 $sucesso = 'Usuário criado com sucesso!';
             }
         } catch (Exception $e) {
-            $erro = 'Erro: o login já existe ou ocorreu falha no banco de dados.';
+            $erro = 'Erro: o login ou email já existe ou ocorreu falha no banco de dados.';
         }
     }
 }
@@ -70,6 +72,10 @@ headerHTML('Usuários', 'usuarios');
                     <div class="mb-3">
                         <label class="form-label obrigatorio">Login</label>
                         <input type="text" class="form-control" name="login" id="userLogin" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Email <small class="text-muted">(para recuperação de senha)</small></label>
+                        <input type="email" class="form-control" name="email" id="userEmail" placeholder="usuario@exemplo.com">
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Senha <small class="text-muted">(preencha para alterar)</small></label>
@@ -107,6 +113,7 @@ headerHTML('Usuários', 'usuarios');
                         <tr>
                             <th>Nome</th>
                             <th>Login</th>
+                            <th>Email</th>
                             <th>Perfil</th>
                             <th>Status</th>
                             <th>Ações</th>
@@ -117,6 +124,7 @@ headerHTML('Usuários', 'usuarios');
                             <tr>
                                 <td><?= sanitizar($u['nome']) ?></td>
                                 <td><?= sanitizar($u['login']) ?></td>
+                                <td><small><?= sanitizar($u['email'] ?? '') ?: '<span class="text-muted">—</span>' ?></small></td>
                                 <td>
                                     <?php 
                                         $cores = ['OPERADOR'=>'secondary','ADMINISTRATIVO'=>'info','GESTOR'=>'danger'];
@@ -133,7 +141,7 @@ headerHTML('Usuários', 'usuarios');
                                 </td>
                                 <td>
                                     <button class="btn btn-sm btn-outline-primary" 
-                                        onclick="editar(<?= $u['id'] ?>, '<?= sanitizar($u['nome']) ?>', '<?= sanitizar($u['login']) ?>', '<?= $u['perfil'] ?>', <?= $u['ativo'] ?>)">
+                                        onclick="editar(<?= $u['id'] ?>, '<?= sanitizar($u['nome']) ?>', '<?= sanitizar($u['login']) ?>', '<?= sanitizar($u['email'] ?? '') ?>', '<?= $u['perfil'] ?>', <?= $u['ativo'] ?>)">
                                         <i class="bi bi-pencil"></i>
                                     </button>
                                 </td>
@@ -147,10 +155,11 @@ headerHTML('Usuários', 'usuarios');
 </div>
 
 <script>
-function editar(id, nome, login, perfil, ativo) {
+function editar(id, nome, login, email, perfil, ativo) {
     document.getElementById('userId').value = id;
     document.getElementById('userNome').value = nome;
     document.getElementById('userLogin').value = login;
+    document.getElementById('userEmail').value = email;
     document.getElementById('userPerfil').value = perfil;
     document.getElementById('userAtivo').checked = (ativo == 1);
     document.getElementById('userSenha').required = false;

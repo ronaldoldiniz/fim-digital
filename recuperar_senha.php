@@ -15,9 +15,8 @@ require_once __DIR__ . '/config/db.php';
 $pdo = getConnection();
 
 // Auto-migration: criar coluna email e tabela password_resets se não existirem
-try {
-    $pdo->exec("ALTER TABLE usuarios ADD COLUMN email VARCHAR(255) DEFAULT NULL UNIQUE AFTER login, ADD INDEX idx_email (email)");
-} catch (PDOException $e) {}
+try { $pdo->exec("ALTER TABLE usuarios ADD COLUMN email VARCHAR(255) DEFAULT NULL UNIQUE AFTER login"); } catch (PDOException $e) {}
+try { $pdo->exec("ALTER TABLE usuarios ADD INDEX idx_email (email)"); } catch (PDOException $e) {}
 try {
     $pdo->exec("CREATE TABLE IF NOT EXISTS password_resets (
         id INT AUTO_INCREMENT PRIMARY KEY,
@@ -52,7 +51,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if ($usuario) {
             // Invalidar tokens anteriores do usuário
-            $pdo->prepare("UPDATE password_resets SET used_at = NOW() WHERE usuario_id = ? AND used_at IS NULL")->execute([$usuario['id']]);
+            $pdo->prepare("UPDATE password_resets SET used_at = UTC_TIMESTAMP() WHERE usuario_id = ? AND used_at IS NULL")->execute([$usuario['id']]);
             
             $token = gerarTokenRedefinicao($usuario['id']);
             if ($token) {
