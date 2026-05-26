@@ -9,11 +9,13 @@ CREATE TABLE IF NOT EXISTS usuarios (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nome VARCHAR(100) NOT NULL,
     login VARCHAR(50) NOT NULL UNIQUE,
+    email VARCHAR(255) DEFAULT NULL UNIQUE,
     senha_hash VARCHAR(255) NOT NULL,
     perfil ENUM('OPERADOR','ADMINISTRATIVO','GESTOR') NOT NULL DEFAULT 'OPERADOR',
     ativo TINYINT(1) NOT NULL DEFAULT 1,
     data_cadastro DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    INDEX idx_login (login)
+    INDEX idx_login (login),
+    INDEX idx_email (email)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- Senha padrão: admin123
@@ -163,3 +165,20 @@ CREATE TABLE IF NOT EXISTS sequencial_fim (
     ano INT NOT NULL PRIMARY KEY,
     ultimo_numero INT NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Tabela para tokens de redefinição de senha
+CREATE TABLE IF NOT EXISTS password_resets (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    usuario_id INT NOT NULL,
+    token VARCHAR(64) NOT NULL UNIQUE,
+    expires_at DATETIME NOT NULL,
+    used_at DATETIME DEFAULT NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE,
+    INDEX idx_token (token),
+    INDEX idx_expires (expires_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Migração: Adicionar coluna email (executar em banco existente)
+-- ALTER TABLE usuarios ADD COLUMN email VARCHAR(255) DEFAULT NULL UNIQUE AFTER login;
+-- ALTER TABLE usuarios ADD INDEX idx_email (email);

@@ -63,7 +63,7 @@ function fazerLogin(string $login, string $senha): bool|string {
     require_once __DIR__ . '/db.php';
     $pdo = getConnection();
     
-    $stmt = $pdo->prepare("SELECT id, nome, login, senha_hash, perfil, ativo FROM usuarios WHERE login = ? LIMIT 1");
+    $stmt = $pdo->prepare("SELECT id, nome, login, email, senha_hash, perfil, ativo FROM usuarios WHERE login = ? LIMIT 1");
     $stmt->execute([$login]);
     $usuario = $stmt->fetch();
     
@@ -95,4 +95,69 @@ function fazerLogout(): void {
     session_destroy();
     header('Location: login.php');
     exit;
+}
+
+/**
+ * Busca usuário pelo email
+ */
+function buscarUsuarioPorEmail(string $email): array|false {
+    $pdo = getConnection();
+    $stmt = $pdo->prepare("SELECT id, nome, login, email FROM usuarios WHERE email = ? AND ativo = 1 LIMIT 1");
+    $stmt->execute([$email]);
+    return $stmt->fetch();
+}
+
+/**
+ * Gera token de redefinição de senha
+ */
+function gerarTokenRedefinicao(int $usuario_id): string|false {
+    $pdo = getConnection();
+    $token = bin2hex(random_bytes(32));
+    $expires = date('Y-m-d H:i:s', strtotime('+1 hour'));
+    $stmt = $pdo->prepare("INSERT INTO password_resets (usuario_id, token, expires_at) VALUES (?, ?, ?)");
+    if ($stmt->execute([$usuario_id, $token, $expires])) {
+        return $token;
+    }
+    return false;
+}
+
+/**
+ * Valida token de redefinição e retorna dados do usuário
+ */
+function validarTokenRedefinicao(string $token): array|false {
+    $pdo = getConnection();
+    $stmt = $pdo->prepare("
+        SELECT pr.*, u.id as user_id, u.nome, u.login, u.email
+        FROM password_resets pr
+        JOIN usuarios u ON pr.usuario_id = u.id
+        WHERE pr.token = ? AND pr.used_at IS NULL AND pr.expires_at > NOW()
+        LIMIT 1
+    ");
+    $stmt->execute([$token]);
+    return $stmt->fetch();
+}
+
+/**
+ * Marca token como utilizado e atualiza a senha
+ */
+function redefinirSenhaComToken(string $token, string $novaSenha): bool {
+    $pdo = getConnection();
+    $dados = validarTokenRedefinicao($token);
+    if (!$dados) return false;
+    
+    $hash = password_hash($novaSenha, PASSWORD_DEFAULT);
+    $pdo->beginTransaction();
+    try {
+        $stmt1 = $pdo->prepare("UPDATE usuarios SET senha_hash = ? WHERE id = ?");
+        $stmt1->execute([$hash, $dados['user_id']]);
+        
+        $stmt2 = $pdo->prepare("UPDATE password_resets SET used_at = NOW() WHERE id = ?");
+        $stmt2->execute([$dados['id']]);
+        
+        $pdo->commit();
+        return true;
+    } catch (Exception $e) {
+        $pdo->rollBack();
+        return false;
+    }
 }

@@ -291,6 +291,18 @@ function headerHTML(string $titulo = 'FIM Digital', string $paginaAtiva = ''): v
 }
 
 /**
+ * Envia email com template HTML
+ */
+function enviarEmail(string $para, string $assunto, string $corpoHtml): bool {
+    $headers  = "MIME-Version: 1.0\r\n";
+    $headers .= "Content-Type: text/html; charset=utf-8\r\n";
+    $headers .= "From: FIM Digital <noreply@moroto.com.br>\r\n";
+    $headers .= "Reply-To: suporte@moroto.com.br\r\n";
+    $headers .= "X-Mailer: PHP/" . PHP_VERSION . "\r\n";
+    return mail($para, $assunto, $corpoHtml, $headers);
+}
+
+/**
  * Retorna o footer HTML padrão do sistema
  */
 function footerHTML(): void {

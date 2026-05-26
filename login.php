@@ -98,6 +98,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </button>
             </form>
 
+            <div class="text-center mt-3">
+                <a href="recuperar_senha.php" class="text-decoration-none small">
+                    <i class="bi bi-question-circle me-1"></i> Esqueceu sua senha?
+                </a>
+            </div>
+
             <div class="text-center mt-4">
                 <small class="text-muted">
                     FIM Digital v1.0 &copy; <?= date('Y') ?> Morotó Indústria

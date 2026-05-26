@@ -638,6 +638,33 @@ body {
 }
 
 /* ================================================================
+   PÁGINAS DE RECUPERAÇÃO DE SENHA
+   ================================================================ */
+.login-card .form-text {
+    font-size: 0.8rem;
+}
+
+.login-card a:not(.btn) {
+    color: #e67e22;
+    transition: color 0.2s;
+}
+
+.login-card a:not(.btn):hover {
+    color: #d35400;
+    text-decoration: underline;
+}
+
+.login-card .alert {
+    border-radius: 12px;
+    font-size: 0.9rem;
+}
+
+.login-card .btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+/* ================================================================
    LINHA DO TEMPO DO EQUIPAMENTO
    ================================================================ */
 .timeline {
