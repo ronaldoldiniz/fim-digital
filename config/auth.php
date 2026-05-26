@@ -5,10 +5,28 @@
  */
 
 session_start();
+require_once __DIR__ . '/db.php';
 
-/**
- * Verifica se o usuário está logado. Redireciona para login se não estiver.
- */
+// Auto-migration: coluna email e tabela password_resets
+try {
+    $pdo = getConnection();
+    $pdo->exec("ALTER TABLE usuarios ADD COLUMN email VARCHAR(255) DEFAULT NULL UNIQUE AFTER login");
+} catch (PDOException $e) {}
+try {
+    $pdo = getConnection();
+    @$pdo->exec("CREATE TABLE IF NOT EXISTS password_resets (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        usuario_id INT NOT NULL,
+        token VARCHAR(64) NOT NULL UNIQUE,
+        expires_at DATETIME NOT NULL,
+        used_at DATETIME DEFAULT NULL,
+        created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE,
+        INDEX idx_token (token),
+        INDEX idx_expires (expires_at)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+} catch (PDOException $e) {}
+
 function verificarLogin(): void {
     if (!isset($_SESSION['usuario_id'])) {
         header('Location: login.php');
@@ -63,7 +81,7 @@ function fazerLogin(string $login, string $senha): bool|string {
     require_once __DIR__ . '/db.php';
     $pdo = getConnection();
     
-    $stmt = $pdo->prepare("SELECT id, nome, login, email, senha_hash, perfil, ativo FROM usuarios WHERE login = ? LIMIT 1");
+    $stmt = $pdo->prepare("SELECT id, nome, login, senha_hash, perfil, ativo FROM usuarios WHERE login = ? LIMIT 1");
     $stmt->execute([$login]);
     $usuario = $stmt->fetch();
     

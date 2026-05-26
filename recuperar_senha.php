@@ -11,27 +11,8 @@ if (isset($_SESSION['usuario_id'])) {
     exit;
 }
 
-require_once __DIR__ . '/config/db.php';
-$pdo = getConnection();
-
-// Auto-migration: criar coluna email e tabela password_resets se não existirem
-try { $pdo->exec("ALTER TABLE usuarios ADD COLUMN email VARCHAR(255) DEFAULT NULL UNIQUE AFTER login"); } catch (PDOException $e) {}
-try { $pdo->exec("ALTER TABLE usuarios ADD INDEX idx_email (email)"); } catch (PDOException $e) {}
-try {
-    $pdo->exec("CREATE TABLE IF NOT EXISTS password_resets (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        usuario_id INT NOT NULL,
-        token VARCHAR(64) NOT NULL UNIQUE,
-        expires_at DATETIME NOT NULL,
-        used_at DATETIME DEFAULT NULL,
-        created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE,
-        INDEX idx_token (token),
-        INDEX idx_expires (expires_at)
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
-} catch (PDOException $e) {}
-
 require_once __DIR__ . '/config/auth.php';
+$pdo = getConnection();
 
 $mensagem = '';
 $tipoMsg = '';
