@@ -32,7 +32,7 @@ require_once __DIR__ . '/../vendor/autoload.php';
 
 // Montar HTML das Dimensões do Rotor (MA - MI)
 $rotorDimsHtml = '';
-if (in_array($b['tipo_fabricacao'] ?? '', ['MA', 'MI'])) {
+if (!$modoCliente && in_array($b['tipo_fabricacao'] ?? '', ['MA', 'MI'])) {
     $rotorDimsHtml = '
     <tr><td colspan="4" class="title bg-yellow">DIMENSÕES DO ROTOR (MA - MI)</td></tr>
     <tr>';

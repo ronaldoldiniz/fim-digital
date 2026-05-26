@@ -175,7 +175,7 @@ function f3($val) {
                 <div class="value">Radial: <?= f1($b['folga_radial_mm']) ?> mm | Axial: <?= f1($b['folga_axial_mm']) ?> mm</div>
             </td>
         </tr>
-        <?php if (in_array($b['tipo_fabricacao'] ?? '', ['MA', 'MI'])): ?>
+        <?php if (!$modoCliente && in_array($b['tipo_fabricacao'] ?? '', ['MA', 'MI'])): ?>
         <tr><td colspan="4" class="section-title bg-yellow">DIMENSÕES DO ROTOR (MA - MI)</td></tr>
         <tr>
             <?php for($i=1; $i<=4; $i++): ?>
