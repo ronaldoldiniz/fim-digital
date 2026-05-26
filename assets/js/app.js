@@ -111,6 +111,11 @@ function salvarBancada(onSuccess) {
     const form = document.getElementById('formBancada');
     if (!form) return;
 
+    // Limpar formatação de campos com separador de milhar
+    form.querySelectorAll('.campo-milhar').forEach(function(el) {
+        el.value = el.value.replace(/\./g, '').replace(',', '.');
+    });
+
     const formData = new FormData(form);
     salvarAjax('actions/salvar_bancada.php', formData, function(data) {
         // Atualizar campos calculados se retornados

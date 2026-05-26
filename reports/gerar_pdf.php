@@ -30,6 +30,34 @@ if (!file_exists(__DIR__ . '/../vendor/autoload.php')) {
 }
 require_once __DIR__ . '/../vendor/autoload.php';
 
+// Montar HTML das Dimensões do Rotor (MA - MI)
+$rotorDimsHtml = '';
+if (in_array($b['tipo_fabricacao'] ?? '', ['MA', 'MI'])) {
+    $rotorDimsHtml = '
+    <tr><td colspan="4" class="title bg-yellow">DIMENSÕES DO ROTOR (MA - MI)</td></tr>
+    <tr>';
+    for($i=1; $i<=4; $i++) {
+        $v = $b["medida_rotor_".$i] ?? null;
+        $rotorDimsHtml .= '<td width="25%" class="text-center">N° '.$i.' (Ø): '.(is_numeric($v)?number_format((float)$v,2,',','.'):'___').' mm</td>';
+    }
+    $rotorDimsHtml .= '
+    </tr>
+    <tr>';
+    for($i=5; $i<=8; $i++) {
+        $v = $b["medida_rotor_".$i] ?? null;
+        $rotorDimsHtml .= '<td width="25%" class="text-center">N° '.$i.' (Ø): '.(is_numeric($v)?number_format((float)$v,2,',','.'):'___').' mm</td>';
+    }
+    $rotorDimsHtml .= '
+    </tr>
+    <tr>';
+    for($i=9; $i<=11; $i++) {
+        $v = $b["medida_rotor_".$i] ?? null;
+        $rotorDimsHtml .= '<td width="25%" class="text-center">N° '.$i.': '.(is_numeric($v)?number_format((float)$v,2,',','.'):'___').' mm</td>';
+    }
+    $rotorDimsHtml .= '<td width="25%"></td>
+    </tr>';
+}
+
 $html = '
 <style>
     body { font-family: sans-serif; font-size: 8px; }
@@ -75,7 +103,7 @@ $html = '
     <tr>
         '.($modoCliente ? '' : '<td>Vazão: '.($b['vazao_m3min']??'___').' m³/min</td>').'
         <td colspan="'.($modoCliente ? 4 : 3).'">Folga Rotor: Rad '.($b['folga_radial_mm']??'___').'mm / Ax '.($b['folga_axial_mm']??'___').'mm</td>
-    </tr>'.'
+    </tr>'.$rotorDimsHtml.'
     <tr>
         <td colspan="2" class="text-center bold">Corrente Operação Normal</td>
         <td colspan="2" class="text-center bold">Corrente Carga Máxima</td>

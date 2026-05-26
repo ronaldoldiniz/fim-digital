@@ -43,6 +43,9 @@ function f1($val) {
 function f2($val) {
     return (is_numeric($val) && $val !== null) ? number_format((float)$val, 2, ',', '.') : '---';
 }
+function f3($val) {
+    return (is_numeric($val) && $val !== null) ? number_format((float)$val, 2, ',', '.') : '---';
+}
 ?>
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -172,6 +175,34 @@ function f2($val) {
                 <div class="value">Radial: <?= f1($b['folga_radial_mm']) ?> mm | Axial: <?= f1($b['folga_axial_mm']) ?> mm</div>
             </td>
         </tr>
+        <?php if (in_array($b['tipo_fabricacao'] ?? '', ['MA', 'MI'])): ?>
+        <tr><td colspan="4" class="section-title bg-yellow">DIMENSÕES DO ROTOR (MA - MI)</td></tr>
+        <tr>
+            <?php for($i=1; $i<=4; $i++): ?>
+            <td width="25%" class="text-center">
+                <span class="label">N° <?= $i ?> (Ø)</span>
+                <div class="value"><?= f3($b['medida_rotor_'.$i] ?? null) ?> mm</div>
+            </td>
+            <?php endfor; ?>
+        </tr>
+        <tr>
+            <?php for($i=5; $i<=8; $i++): ?>
+            <td width="25%" class="text-center">
+                <span class="label">N° <?= $i ?> (Ø)</span>
+                <div class="value"><?= f3($b['medida_rotor_'.$i] ?? null) ?> mm</div>
+            </td>
+            <?php endfor; ?>
+        </tr>
+        <tr>
+            <?php for($i=9; $i<=11; $i++): ?>
+            <td width="25%" class="text-center">
+                <span class="label">N° <?= $i ?></span>
+                <div class="value"><?= f3($b['medida_rotor_'.$i] ?? null) ?> mm</div>
+            </td>
+            <?php endfor; ?>
+            <td width="25%"></td>
+        </tr>
+        <?php endif; ?>
         <tr>
             <td colspan="2" class="text-center bg-green bold">CORRENTE OPERAÇÃO NORMAL (A)</td>
             <td colspan="2" class="text-center bg-green bold">CORRENTE CARGA MÁXIMA (A)</td>

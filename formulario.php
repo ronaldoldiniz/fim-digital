@@ -49,6 +49,18 @@ foreach ($campos1Casa as $c) {
     }
 }
 
+// Formatar campo Pressão Positiva com separador de milhar (pt-BR)
+$valPressao = $bancada['pressao_positiva_mmh2o'] ?? '';
+if (is_numeric($valPressao)) {
+    $bancada['pressao_positiva_mmh2o'] = number_format((float)$valPressao, 1, ',', '.');
+} elseif (strpos($valPressao, ',') !== false) {
+    $convertido = str_replace('.', '', $valPressao);
+    $convertido = str_replace(',', '.', $convertido);
+    if (is_numeric($convertido)) {
+        $bancada['pressao_positiva_mmh2o'] = number_format((float)$convertido, 1, ',', '.');
+    }
+}
+
 if (isset($bancada['fator_servico']) && is_numeric($bancada['fator_servico'])) {
     $bancada['fator_servico'] = number_format((float)$bancada['fator_servico'], 2, '.', '');
 }
@@ -164,7 +176,7 @@ headerHTML('FIM: ' . $reg['id_interno'], 'formulario');
                     <?php endif; ?>
                     <div class="col-md-2">
                         <label class="form-label fs-7">Nº Série</label>
-                        <input type="text" class="form-control form-control-sm<?= $reg['status'] === 'FINALIZADO' ? ' bg-light' : '' ?>" name="numero_serie_equipamento" value="<?= sanitizar($reg['numero_serie_motor'] ?: 'Sem Número') ?>" <?= ($somosLeitura || $reg['status'] === 'FINALIZADO') ? 'readonly' : '' ?>>
+                        <input type="text" class="form-control form-control-sm<?= $reg['status'] === 'FINALIZADO' ? ' bg-light' : '' ?>" name="numero_serie_equipamento" value="<?= sanitizar($reg['numero_serie_motor'] ?? '') ?>" <?= ($somosLeitura || $reg['status'] === 'FINALIZADO') ? 'readonly' : '' ?>>
                     </div>
                     <div class="col-md-2">
                         <label class="form-label fs-7">Nº Nota Fiscal</label>
@@ -278,7 +290,7 @@ headerHTML('FIM: ' . $reg['id_interno'], 'formulario');
                             <div class="mb-0">
                                 <div class="input-group input-group-compact">
                                     <span class="input-group-text fw-bold" style="width: 140px;">Pos.</span>
-                                    <input type="number" step="0.1" class="form-control" name="pressao_positiva_mmh2o" value="<?= $bancada['pressao_positiva_mmh2o'] ?? '' ?>" <?= $somosLeitura ? 'readonly' : '' ?>>
+                                    <input type="text" inputmode="decimal" class="form-control campo-milhar" name="pressao_positiva_mmh2o" id="pressao_positiva_mmh2o" value="<?= $bancada['pressao_positiva_mmh2o'] ?? '' ?>" <?= $somosLeitura ? 'readonly' : '' ?>>
                                     <span class="input-group-text">mmH2O</span>
                                 </div>
                             </div>
@@ -366,14 +378,19 @@ headerHTML('FIM: ' . $reg['id_interno'], 'formulario');
                     <h6 class="text-primary mb-4 fw-bold border-bottom pb-2"><i class="bi bi-rulers me-2"></i>DIMENSÕES DO ROTOR (MA - MI)</h6>
                     
                     <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-3 mb-4">
-                        <?php for($i=1; $i<=11; $i++): ?>
+                        <?php for($i=1; $i<=11; $i++): 
+                            $val = $bancada['medida_rotor_'.$i] ?? '';
+                            if (is_numeric($val)) {
+                                $val = number_format((float)$val, 2, '.', '');
+                            }
+                        ?>
                             <div class="col">
                                 <div class="input-group">
                                     <span class="input-group-text fw-bold bg-light" style="width: 110px;">N° <?= $i ?></span>
                                     <?php if($i <= 6): ?>
                                         <span class="input-group-text bg-white" title="Diâmetro" style="width: 60px;">Ø</span>
                                     <?php endif; ?>
-                                    <input type="number" step="0.001" class="form-control" name="medida_rotor_<?= $i ?>" value="<?= $bancada['medida_rotor_'.$i] ?? '' ?>" <?= $somosLeitura ? 'readonly' : '' ?>>
+                                    <input type="number" step="0.01" class="form-control" name="medida_rotor_<?= $i ?>" value="<?= $val ?>" onblur="this.value = parseFloat(this.value).toFixed(2)" <?= $somosLeitura ? 'readonly' : '' ?>>
                                     <span class="input-group-text">mm</span>
                                 </div>
                             </div>
@@ -913,6 +930,34 @@ function ampliarImagem(src) {
     document.getElementById('imgZoom').src = src;
     modal.show();
 }
+
+function formatarCampoMilhar(el) {
+    if (!el || !el.value) return;
+    var val = el.value;
+    if (val.indexOf(',') > -1) {
+        val = val.replace(/\./g, '').replace(',', '.');
+    }
+    var n = parseFloat(val);
+    if (isNaN(n)) return;
+    var partes = n.toFixed(1).split('.');
+    partes[0] = partes[0].replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    el.value = partes[0] + ',' + partes[1];
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.campo-milhar').forEach(function(el) {
+        if (el.value.indexOf(',') === -1) {
+            formatarCampoMilhar(el);
+        }
+        el.addEventListener('focus', function() {
+            this.value = this.value.replace(/\./g, '').replace(',', '.');
+        });
+        el.addEventListener('blur', function() {
+            formatarCampoMilhar(this);
+        });
+    });
+});
+
 </script>
 
 <?php footerHTML(); ?>

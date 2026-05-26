@@ -57,7 +57,13 @@ $textos = ['tensao_teste_220','tensao_teste_380','tensao_teste_440','descricao_m
 $dados = [];
 foreach ($decimais as $campo) {
     $val = $_POST[$campo] ?? null;
-    $val = str_replace(',', '.', $val ?? '');
+    $val = $val ?? '';
+    if (strpos($val, ',') !== false) {
+        $val = str_replace('.', '', $val);
+        $val = str_replace(',', '.', $val);
+    } else {
+        $val = str_replace(',', '.', $val);
+    }
     $dados[$campo] = ($val !== '' && $val !== null) ? (float)$val : null;
 }
 foreach ($textos as $campo) {
