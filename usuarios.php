@@ -8,9 +8,31 @@ verificarPerfil(['GESTOR']); // Apenas GESTOR
 $pdo = getConnection();
 $erro = '';
 $sucesso = '';
+$linkGerado = '';
+
+// GET: Gerar link de redefinição para um usuário
+if (isset($_GET['gerar_link'])) {
+    $uid = (int)$_GET['gerar_link'];
+    $stmt = $pdo->prepare("SELECT id, nome, login FROM usuarios WHERE id = ?");
+    $stmt->execute([$uid]);
+    $user = $stmt->fetch();
+    if ($user) {
+        $pdo->prepare("UPDATE password_resets SET used_at = UTC_TIMESTAMP() WHERE usuario_id = ? AND used_at IS NULL")->execute([$uid]);
+        $token = bin2hex(random_bytes(32));
+        $expires = gmdate('Y-m-d H:i:s', strtotime('+1 hour'));
+        $pdo->prepare("INSERT INTO password_resets (usuario_id, token, expires_at) VALUES (?, ?, ?)")->execute([$uid, $token, $expires]);
+        $baseUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http')
+                 . '://' . $_SERVER['HTTP_HOST']
+                 . rtrim(dirname($_SERVER['SCRIPT_NAME']), '/');
+        $linkGerado = $baseUrl . '/redefinir_senha.php?token=' . urlencode($token);
+        $sucesso = 'Link gerado para <strong>' . htmlspecialchars($user['nome']) . '</strong> (' . htmlspecialchars($user['login']) . '):';
+    } else {
+        $erro = 'Usuário não encontrado.';
+    }
+}
 
 // POST: Criar/Editar usuário
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_GET['gerar_link'])) {
     $id = (int)($_POST['id'] ?? 0);
     $nome = trim($_POST['nome'] ?? '');
     $login = trim($_POST['login'] ?? '');
@@ -61,7 +83,20 @@ headerHTML('Usuários', 'usuarios');
             </div>
             <div class="card-body">
                 <?php if($erro): ?><div class="alert alert-danger"><?= $erro ?></div><?php endif; ?>
-                <?php if($sucesso): ?><div class="alert alert-success"><?= $sucesso ?></div><?php endif; ?>
+                <?php if($sucesso): ?>
+                <div class="alert alert-success">
+                    <?= $sucesso ?>
+                    <?php if ($linkGerado): ?>
+                    <div class="mt-2 p-2 bg-white rounded border" style="word-break:break-all;font-size:0.85rem">
+                        <a href="<?= htmlspecialchars($linkGerado) ?>"><?= htmlspecialchars($linkGerado) ?></a>
+                    </div>
+                    <button class="btn btn-sm btn-outline-dark mt-1" onclick="navigator.clipboard.writeText('<?= htmlspecialchars($linkGerado) ?>');this.textContent='Copiado!';setTimeout(()=>this.textContent='Copiar link',2000)">
+                        <i class="bi bi-clipboard"></i> Copiar link
+                    </button>
+                    <div class="small text-muted mt-1">⏳ Expira em 1 hora</div>
+                    <?php endif; ?>
+                </div>
+                <?php endif; ?>
                 
                 <form method="POST" id="formUser">
                     <input type="hidden" name="id" id="userId">
@@ -139,11 +174,15 @@ headerHTML('Usuários', 'usuarios');
                                         <span class="badge bg-danger">Inativo</span>
                                     <?php endif; ?>
                                 </td>
-                                <td>
+                                <td style="white-space:nowrap">
                                     <button class="btn btn-sm btn-outline-primary" 
-                                        onclick="editar(<?= $u['id'] ?>, '<?= sanitizar($u['nome']) ?>', '<?= sanitizar($u['login']) ?>', '<?= sanitizar($u['email'] ?? '') ?>', '<?= $u['perfil'] ?>', <?= $u['ativo'] ?>)">
+                                        onclick="editar(<?= $u['id'] ?>, '<?= sanitizar($u['nome']) ?>', '<?= sanitizar($u['login']) ?>', '<?= sanitizar($u['email'] ?? '') ?>', '<?= $u['perfil'] ?>', <?= $u['ativo'] ?>)"
+                                        title="Editar">
                                         <i class="bi bi-pencil"></i>
                                     </button>
+                                    <a href="?gerar_link=<?= $u['id'] ?>" class="btn btn-sm btn-outline-warning" title="Gerar link de redefinição de senha">
+                                        <i class="bi bi-key"></i>
+                                    </a>
                                 </td>
                             </tr>
                         <?php endforeach; ?>
