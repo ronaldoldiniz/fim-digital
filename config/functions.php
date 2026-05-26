@@ -294,12 +294,16 @@ function headerHTML(string $titulo = 'FIM Digital', string $paginaAtiva = ''): v
  * Envia email com template HTML
  */
 function enviarEmail(string $para, string $assunto, string $corpoHtml): bool {
+    $dominio = $_SERVER['HTTP_HOST'] ?? 'localhost';
+    $fromAddr = 'noreply@' . $dominio;
+    $replyTo = 'noreply@' . $dominio;
     $headers  = "MIME-Version: 1.0\r\n";
     $headers .= "Content-Type: text/html; charset=utf-8\r\n";
-    $headers .= "From: FIM Digital <noreply@moroto.com.br>\r\n";
-    $headers .= "Reply-To: suporte@moroto.com.br\r\n";
+    $headers .= "From: FIM Digital <$fromAddr>\r\n";
+    $headers .= "Reply-To: $replyTo\r\n";
     $headers .= "X-Mailer: PHP/" . PHP_VERSION . "\r\n";
-    return mail($para, $assunto, $corpoHtml, $headers);
+    $params = "-f $fromAddr";
+    return mail($para, '=?UTF-8?B?'.base64_encode($assunto).'?=', $corpoHtml, $headers, $params);
 }
 
 /**

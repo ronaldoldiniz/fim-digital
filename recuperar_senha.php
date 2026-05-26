@@ -41,6 +41,7 @@ require_once __DIR__ . '/config/auth.php';
 $mensagem = '';
 $tipoMsg = '';
 $email = '';
+$linkExibido = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = trim($_POST['email'] ?? '');
@@ -50,10 +51,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $mensagem = 'Informe um endereço de email válido.';
     } else {
         $usuario = buscarUsuarioPorEmail($email);
-        
-        // Sempre mostra a mesma mensagem por segurança (não revelar se email existe)
-        $mensagem = 'Se este email estiver cadastrado, você receberá instruções para redefinir sua senha em alguns minutos.';
-        $tipoMsg = 'success';
         
         if ($usuario) {
             $token = gerarTokenRedefinicao($usuario['id']);
@@ -99,8 +96,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </body>
                 </html>';
                 
-                enviarEmail($usuario['email'], 'Redefinição de Senha - FIM Digital', $corpoHtml);
+                $emailOk = enviarEmail($usuario['email'], 'Redefinição de Senha - FIM Digital', $corpoHtml);
+                if (!$emailOk) {
+                    $mensagem = 'Não foi possível enviar o email. Use o link abaixo diretamente (válido por 1 hora):';
+                    $tipoMsg = 'warning';
+                    $linkExibido = $link;
+                } else {
+                    $mensagem = 'Enviamos um link de redefinição para <strong>' . htmlspecialchars($email) . '</strong>. Verifique sua caixa de entrada e spam.';
+                    $tipoMsg = 'success';
+                }
+            } else {
+                $mensagem = 'Erro ao gerar token. Tente novamente.';
+                $tipoMsg = 'danger';
             }
+        } else {
+            $mensagem = 'Email não encontrado em nossa base. Entre em contato com o administrador para cadastrar seu email.';
+            $tipoMsg = 'warning';
         }
     }
 }
@@ -131,7 +142,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <?php if ($tipoMsg === 'success'): ?>
                 <div class="alert alert-success d-flex align-items-center" role="alert">
                     <i class="bi bi-check-circle-fill me-2"></i>
+                    <?= $mensagem ?>
+                </div>
+                <?php elseif ($tipoMsg === 'warning'): ?>
+                <div class="alert alert-warning" role="alert">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
                     <?= htmlspecialchars($mensagem) ?>
+                    <?php if (isset($linkExibido)): ?>
+                    <div class="mt-2 p-2 bg-white rounded border" style="word-break:break-all;font-size:0.85rem">
+                        <a href="<?= htmlspecialchars($linkExibido) ?>"><?= htmlspecialchars($linkExibido) ?></a>
+                    </div>
+                    <?php endif; ?>
                 </div>
                 <?php else: ?>
                 <div class="alert alert-danger d-flex align-items-center" role="alert">
